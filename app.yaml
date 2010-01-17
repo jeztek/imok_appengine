@@ -1,0 +1,22 @@
+application: imokapp
+version: 1
+runtime: python
+api_version: 1
+
+handlers:
+
+- url: /static/css
+  static_dir: static/css
+  mime_type: text/css
+
+- url: /static/js
+  static_dir: static/js
+  mime_type: text/javascript
+
+- url: /static/img
+  static_dir: static/img
+  mime_type: image/png
+
+- url: .*
+  script: main.py
+
