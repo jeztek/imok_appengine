@@ -1,21 +1,20 @@
 import os, datetime
 
-from google.appengine.ext import db
 from google.appengine.api import users
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template, util
 
-# DATABASE
-class ImokUser(db.Model):
-  account = db.UserProperty()
-  
-  
-# WEBAPP
+
 class MainHandler(webapp.RequestHandler):
 
   def get(self):
+    user = users.get_current_user()
+    if not user:
+      self.redirect(users.create_login_url(self.request.uri))
+
     template_data = {
-      'username' : 'Test User',
+      'username' : user.nickname(),
+      'logout_url' : users.create_logout_url("/"),
     }
 
     template_path = os.path.join(os.path.dirname(__file__), 'main.html')
@@ -26,16 +25,18 @@ class MainHandler(webapp.RequestHandler):
 class UserRegisterHandler(webapp.RequestHandler):
 
   def get(self):
+    username = self.request.get('username')
+    
     self.response.headers['Content-Type'] = 'text/html'
-    self.response.out.write("Hello!")
+    self.response.out.write("Hello " + username)
 
-# MAIN
+
 def main():
   application = webapp.WSGIApplication([
     ('/', MainHandler),
-    ('/user/register', UserRegisterHandler),
+    ('/user/register/', UserRegisterHandler),
                                         
-    ], debug=True)
+  ], debug=True)
   util.run_wsgi_app(application)
 
 

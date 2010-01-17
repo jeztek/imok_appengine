@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+<ul>
+{% for post in posts %}
+<li>{{ post.datetime }} - {{ post.message }}</li>
+{% endfor %}
+</ul>
+
+{% endblock body %}

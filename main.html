@@ -1,8 +1,10 @@
 {% extends "base.html" %}
 
 {% block body %}
+<p>{{ username }} [ <a href="{{ logout_url }}">Logout</a> ]</p>
 
-<body>
-Hello {{ username }}
+{% if message %}<div class="message">{{ message }}</div>{% endif %}
+
+I'm OK!
 
 {% endblock body %}

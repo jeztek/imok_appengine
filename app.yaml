@@ -17,6 +17,8 @@ handlers:
   static_dir: static/img
   mime_type: image/png
 
+- url: /incoming/.*
+  script: incoming.py
+
 - url: .*
   script: main.py
-
