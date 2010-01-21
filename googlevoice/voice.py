@@ -21,7 +21,7 @@ class Voice(object):
 
         for name in settings.FEEDS:
             setattr(self, name, self.__get_xml_page(name))
-        
+
     ######################
     # Some handy methods
     ######################  
@@ -180,12 +180,31 @@ class Voice(object):
         return self._contacts
     contacts = property(contacts)
 
+
+    ######################
+    # Pagination
+    ######################
+
+    def get_page(self, feed, page, data=None, headers={}):
+        """
+        Hackish way of doing pagination
+        """
+        if feed.lower() not in settings.FEEDS:
+            raise NoSuchFeedError
+
+        if isinstance(data, dict):
+            data.update({'page': "p%d" % page })
+        elif isinstance(data, tuple):
+            data += ('page', "p%d" % page)
+        elif data is None:
+            data = {'page': "p%d" % page}
+        return self.__get_xml_page(feed, data, headers)
+
     ######################
     # Helper methods
     ######################
-
     
-    def __do_page(self, page, data=None, headers={}):
+    def __do_page(self, page, data=None, headers={}, force_get=False):
         """
         Loads a page out of the settings and pass it on to urllib Request
         """
@@ -195,6 +214,8 @@ class Voice(object):
         headers.update({'User-Agent': 'PyGoogleVoice/0.5'})
         if log:
             log.debug('%s?%s - %s' % (getattr(settings, page)[22:], data or '', headers))
+        if data and force_get:
+            return urlopen(Request(getattr(settings, page) + '?' + data, None, headers))
         if page in ('DOWNLOAD','XML_SEARCH'):
             return urlopen(Request(getattr(settings, page) + data, None, headers))
         if data:
@@ -210,7 +231,7 @@ class Voice(object):
 
     _Phone__validate_special_page = __validate_special_page
     
-    def __do_special_page(self, page, data=None, headers={}):
+    def __do_special_page(self, page, data=None, headers={}, force_get=False):
         """
         Add self.special to request data
         """
@@ -219,7 +240,7 @@ class Voice(object):
             data += ('_rnr_se', self.special)
         elif isinstance(data, dict):
             data.update({'_rnr_se': self.special})
-        return self.__do_page(page, data, headers)
+        return self.__do_page(page, data, headers, force_get)
         
     _Phone__do_special_page = __do_special_page
     
@@ -227,7 +248,7 @@ class Voice(object):
         """
         Return XMLParser instance generated from given page
         """
-        return XMLParser(self, page, lambda: self.__do_special_page('XML_%s' % page.upper(), data, headers).read())
+        return XMLParser(self, page, lambda: self.__do_page('XML_%s' % page.upper(), data, headers, True).read())
       
     def __messages_post(self, page, *msgs, **kwargs):
         """

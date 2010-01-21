@@ -105,6 +105,11 @@ class NoCredentialsError(Exception):
     Email or Password were not specified in the config or passed
     as arguments to Voice.login
     """
+
+class NoSuchFeedError(Exception):
+    """
+    The requested feed for pagination does not exist
+    """
     
 class AttrDict(dict):
     def __getattr__(self, attr):
