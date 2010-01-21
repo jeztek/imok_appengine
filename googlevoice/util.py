@@ -1,6 +1,11 @@
 import re
 from xml.parsers.expat import ParserCreate
 from time import gmtime
+from datetime import datetime, time, timedelta
+from sms import extractsms
+
+import hashlib
+
 try:
     from urllib2 import build_opener,install_opener, \
         HTTPCookieProcessor,Request,urlopen
@@ -188,6 +193,7 @@ class Message(AttrDict):
         self.folder = folder
         self.id = id
         super(AttrDict, self).__init__(data)
+        self[u'epochTime'] = self['startTime']
         self['startTime'] = gmtime(int(self['startTime'])/1000)
         self['displayStartDateTime'] = datetime.strptime(
                 self['displayStartDateTime'], '%m/%d/%y %I:%M %p')
@@ -226,6 +232,38 @@ class Message(AttrDict):
     def __repr__(self):
         return '<Message #%s (%s)>' % (self.id, self.phoneNumber)
 
+class SmsMessage(Message):
+    """
+    Wrapper for all parsed/flattened SMS messages in Google Voice
+    Attributes are (in addition to those in Message):
+
+     * smsId: SHA-1 hash
+     * receivedDateTime: the computed time that the SMS was received
+    """
+    def __init__(self, folder, id, data):
+        super(SmsMessage, self).__init__(folder, id, data)
+        
+        # Create the actual time the SMS was received.
+        latest_date = self['displayStartDateTime'].date()
+        received_time = datetime.strptime(self['time'], "%I:%M %p").time()
+        received = datetime.combine(latest_date, received_time)
+        if (received > self['displayStartDateTime']):
+            received = received - timedelta(1)
+        self['receivedDateTime'] = received
+
+    def __cmp__(self, other):
+        """
+        SmsMessages are compared by their receivedDateTime and smsId if
+        those match.
+        """
+        retval = cmp(self['receivedDateTime'], other['receivedDateTime'])
+        if retval == 0:
+            return cmp(self['smsId'], other['smsId'])
+        return retval
+
+    def __repr__(self):
+        return '<SmsMessage #%s (%s)>' % (self.id, self.phoneNumber)    
+
 class Folder(AttrDict):
     """
     Folder wrapper for feeds from Google Voice
@@ -240,12 +278,58 @@ class Folder(AttrDict):
         self.voice = voice
         self.name = name
         super(AttrDict, self).__init__(data)
+
+        self._flattened = False
         
+    def flattensms(self):
+        """
+        Parses the HTML output for SMS messages and flattens
+        the folder such that each sms message is it's own message.
+
+        Generates a new (hopefully) unique SHA-1 hash for the
+        sms message.
+        """
+        if self._flattened == True:
+            return
+
+        smsmsgs = extractsms(getattr(self.voice, self.name).html)
+        for sms in smsmsgs:
+            h = hashlib.sha1()
+            h.update("%s_[%s]" % (str(sms), sms['id']))
+            new_id = h.hexdigest()
+            
+            sms['smsId'] = new_id
+            self['messages'][new_id] = sms
+            self['messages'][new_id].update(self['messages'][sms['id']])
+
+        for sms in smsmsgs:
+            if sms['id'] in self['messages']:
+                del self['messages'][sms['id']]
+        self._flattened = True
+
+    def smsmessages(self):
+        """
+        Flatten the SMS conversations in this Folder and only return them
+        """
+        self.flattensms()
+        msgs = []
+        for msg in self['messages'].items():
+            if 'smsId' in msg[1]:
+                msgs.append(SmsMessage(self, msg[1]['id'], msg[1]))
+        return msgs
+    smsmessages = property(smsmessages)
+
     def messages(self):
         """
-        Returns a list of all messages in this folder
+        Returns a list of all messages in this folder.
         """
-        return [Message(self, *i) for i in self['messages'].items()]
+        msgs = []
+        for msg in self['messages'].items():
+            if 'smsId' not in msg[1]:
+                msgs.append(Message(self, *msg))
+            else:
+                msgs.append(SmsMessage(self, msg[1]['id'], msg[1]))
+        return msgs
     messages = property(messages)
     
     def __len__(self):
