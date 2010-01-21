@@ -1,9 +1,6 @@
 import re
-from sys import stdout
 from xml.parsers.expat import ParserCreate
 from time import gmtime
-from datetime import datetime
-from pprint import pprint
 try:
     from urllib2 import build_opener,install_opener, \
         HTTPCookieProcessor,Request,urlopen
@@ -12,36 +9,40 @@ except ImportError:
     from urllib.request import build_opener,install_opener, \
         HTTPCookieProcessor,Request,urlopen
     from urllib.parse import urlencode,quote
+
 try:
     from http.cookiejar import LWPCookieJar as CookieJar
 except ImportError:
     from cookielib import LWPCookieJar as CookieJar
+
 try:
     from json import loads
 except ImportError:
     from simplejson import loads
-try:
-    input = raw_input
-except NameError:
-    input = input
+
+#try:
+#    input = raw_input
+#except NameError:
+#    input = input
 
 sha1_re = re.compile(r'^[a-fA-F0-9]{40}$')
 
-def print_(*values, **kwargs):
-    """
-    Implementation of Python3's print function
-    
-    Prints the values to a stream, or to sys.stdout by default.
-    Optional keyword arguments:
-    
-    file: a file-like object (stream); defaults to the current sys.stdout.
-    sep:  string inserted between values, default a space.
-    end:  string appended after the last value, default a newline.
-    """
-    fo = kwargs.pop('file', stdout)
-    fo.write(kwargs.pop('sep', ' ').join(map(str, values)))
-    fo.write(kwargs.pop('end', '\n'))
-    fo.flush()
+# Removed due to appengine
+#def print_(*values, **kwargs):
+#    """
+#    Implementation of Python3's print function
+#    
+#    Prints the values to a stream, or to sys.stdout by default.
+#    Optional keyword arguments:
+#    
+#    file: a file-like object (stream); defaults to the current sys.stdout.
+#    sep:  string inserted between values, default a space.
+#    end:  string appended after the last value, default a newline.
+#    """
+#    fo = kwargs.pop('file', stdout)
+#    fo.write(kwargs.pop('sep', ' ').join(map(str, values)))
+#    fo.write(kwargs.pop('end', '\n'))
+#    fo.flush()
 
 def is_sha1(s):
     """
@@ -94,6 +95,11 @@ class ForwardingError(Exception):
     Forwarding number given was incorrect
     """
     
+class NoCredentialsError(Exception):
+    """
+    Email or Password were not specified in the config or passed
+    as arguments to Voice.login
+    """
     
 class AttrDict(dict):
     def __getattr__(self, attr):

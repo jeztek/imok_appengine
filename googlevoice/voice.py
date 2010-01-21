@@ -57,13 +57,12 @@ class Voice(object):
         if email is None:
             email = config.email
         if email is None:
-            email = input('Email address: ')
+            raise NoCredentialsError
         
         if passwd is None:
             passwd = config.password
         if passwd is None:
-            from getpass import getpass
-            passwd = getpass()
+            raise NoCredentialsError
 
         content = self.__do_page('login').read()
         # holy hackjob

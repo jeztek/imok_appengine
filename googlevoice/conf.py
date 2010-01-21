@@ -1,7 +1,6 @@
 from ConfigParser import ConfigParser, NoOptionError
-import os
+import StringIO
 import settings
-
 
 class Config(ConfigParser):
     """
@@ -9,19 +8,11 @@ class Config(ConfigParser):
     ``.gvoice`` and parses configuration data from it.
     """
     def __init__(self):
-        self.fname = os.path.expanduser('~/.gvoice')
-
-        if not os.path.exists(self.fname):
-            try:
-                f = open(self.fname, 'w')
-            except IOError:
-                return
-            f.write(settings.DEFAULT_CONFIG)
-            f.close()
+        self.fp = StringIO.StringIO(settings.DEFAULT_CONFIG)
             
         ConfigParser.__init__(self)
         try:
-            self.read([self.fname])
+            self.readfp(self.fp, "internal")
         except IOError:
             return
 
@@ -41,9 +32,7 @@ class Config(ConfigParser):
             return
         
     def save(self):
-        f = open(self.fname, 'w')
-        self.write(f)
-        f.close()
+        pass
         
 
     phoneType = property(phoneType)
