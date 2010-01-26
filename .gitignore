@@ -5,3 +5,5 @@
 index.yaml
 googlevoice/local_settings.py
 googlevoice/gv_settings
+main.app/
+

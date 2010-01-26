@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block body %}
+<div>
+These are the emails that you have already registered:<br/>
+<table>
+{% for registeredEmail in registeredEmailList %}
+<tr>
+	<td>Email: {{ registeredEmail.emailAddress }}</td>
+	<td><form action="/removeRegisteredEmail?emailAddress={{ registeredEmail.emailAddress|urlencode }}" method="post">
+	<input type="submit" value="Remove"/>
+	</form></td>
+</tr>
+{% endfor %}
+</table>
+</div>
+
+<div>
+<br/>If you would like to register an email, enter it here:<br/>
+<form action="/addRegisteredEmail" method="post">
+	Email: <input type="text" name="emailAddress"/><br/>
+	<div><input type="submit" value="Add Email"/></div>
+</form>
+</div>
+
+<br/><br/><br/>**** This is just a placeholder debugging thing for sending out the emails. Replace this with a trigger from SMS. ****
+<form action="/spamAllRegisteredEmails" method="post">
+	<div><input type="submit" value="Spam!"/></div>
+</form>
+
+{% endblock body %}
