@@ -5,6 +5,8 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template, util
 from google.appengine.ext.webapp.util import login_required
 from google.appengine.ext import db
+from google.appengine.api import mail
+
 
 class RegisteredEmail(db.Model):
   userName = db.UserProperty()
@@ -62,6 +64,31 @@ class RemoveRegisteredEmailHandler(webapp.RequestHandler):
         removeEmailList.delete()
         
     self.redirect('/registerEmail')
+
+
+class SpamAllRegisteredEmailsHandler(webapp.RequestHandler):
+  def post(self):
+    if users.get_current_user():
+      registeredEmailQuery = RegisteredEmail.all().filter('userName =', users.get_current_user()).order('emailAddress')
+      addresses = []
+      for registeredEmail in registeredEmailQuery:
+        addresses.append(registeredEmail.emailAddress)
+        
+      mail.send_mail(sender=users.get_current_user().email(),
+                    to=users.get_current_user().email(),
+                    bcc=addresses,
+                    subject="I'm OK",
+                    body="""
+Dear Registered User:
+
+This is an auto generated email please do not reply. You are registered to receive emails
+regarding the status of USER. This email lets you know they are OK.
+
+Please let us know if you have any questions.
+
+The ImOK.com Team
+""")
+    self.redirect('/registerEmail')
     
     
 def main():
@@ -70,6 +97,7 @@ def main():
     ('/registerEmail', RegisterEmailHandler),
     ('/addRegisteredEmail', AddRegisteredEmailHandler),
     ('/removeRegisteredEmail', RemoveRegisteredEmailHandler),
+    ('/spamAllRegisteredEmails', SpamAllRegisteredEmailsHandler),
                                         
   ], debug=True)
   util.run_wsgi_app(application)
