@@ -3,38 +3,73 @@ import os, datetime
 from google.appengine.api import users
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template, util
+from google.appengine.ext.webapp.util import login_required
+from google.appengine.ext import db
+
+class RegisteredEmail(db.Model):
+  userName = db.UserProperty()
+  emailAddress = db.EmailProperty()
 
 
 class MainHandler(webapp.RequestHandler):
-
+  @login_required
   def get(self):
-    user = users.get_current_user()
-    if not user:
-      self.redirect(users.create_login_url(self.request.uri))
 
-    template_data = {
-      'username' : user.nickname(),
-      'logout_url' : users.create_logout_url("/"),
-    }
+    username = "steve"
+    logout_url = users.create_logout_url("/")
 
     template_path = os.path.join(os.path.dirname(__file__), 'main.html')
     self.response.headers['Content-Type'] = 'text/html'
-    self.response.out.write(template.render(template_path, template_data))
+    self.response.out.write(template.render(template_path, locals()))
 
 
-class UserRegisterHandler(webapp.RequestHandler):
-
+class RegisterEmailHandler(webapp.RequestHandler):
+  @login_required
   def get(self):
-    username = self.request.get('username')
+    registeredEmailQuery = RegisteredEmail.all().filter('userName =', users.get_current_user()).order('emailAddress')
+    registeredEmailList = registeredEmailQuery.fetch(100)
     
+    logout_url = users.create_logout_url("/")
+
+    template_path = os.path.join(os.path.dirname(__file__), 'registerEmail.html')
     self.response.headers['Content-Type'] = 'text/html'
-    self.response.out.write("Hello " + username)
+    self.response.out.write(template.render(template_path, locals()))
 
 
+class AddRegisteredEmailHandler(webapp.RequestHandler):
+  def post(self):
+    if users.get_current_user():
+      newEmail = RegisteredEmail()
+      newEmail.userName = users.get_current_user()
+      success = True
+      try:
+        # can't not remember to validate email
+        newEmail.emailAddress = self.request.get('emailAddress')
+      except:
+        success = False
+      else:
+        newEmail.put()
+    self.redirect('/registerEmail')
+
+
+class RemoveRegisteredEmailHandler(webapp.RequestHandler):
+  def post(self):
+    if users.get_current_user():
+      removeEmail = self.request.get('emailAddress')
+      removeEmailQuery = RegisteredEmail.all().filter('userName =', users.get_current_user()).filter('emailAddress =', removeEmail)
+      removeEmailList = removeEmailQuery.get()
+      if removeEmailList:
+        removeEmailList.delete()
+        
+    self.redirect('/registerEmail')
+    
+    
 def main():
   application = webapp.WSGIApplication([
     ('/', MainHandler),
-    ('/user/register/', UserRegisterHandler),
+    ('/registerEmail', RegisterEmailHandler),
+    ('/addRegisteredEmail', AddRegisteredEmailHandler),
+    ('/removeRegisteredEmail', RemoveRegisteredEmailHandler),
                                         
   ], debug=True)
   util.run_wsgi_app(application)
