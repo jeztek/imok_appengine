@@ -79,12 +79,13 @@ class SpamAllRegisteredEmailsHandler(webapp.RequestHandler):
       addresses = []
       for registeredEmail in registeredEmailQuery:
         addresses.append(registeredEmail.emailAddress)
-        
-      mail.send_mail(sender=users.get_current_user().email(),
-                    to=users.get_current_user().email(),
-                    bcc=addresses,
-                    subject="I'm OK",
-                    body="""
+      
+      if (len(addresses) > 0):
+        mail.send_mail(sender=users.get_current_user().email(),
+                      to=users.get_current_user().email(),
+                      bcc=addresses,
+                      subject="I'm OK",
+                      body="""
 Dear Registered User:
 
 This is an auto generated email please do not reply. You are registered to receive emails
