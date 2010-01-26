@@ -17,7 +17,8 @@ class MainHandler(webapp.RequestHandler):
   @login_required
   def get(self):
 
-    username = "steve"
+    user = users.get_current_user()
+    username = user.nickname()
     logout_url = users.create_logout_url("/")
 
     template_path = os.path.join(os.path.dirname(__file__), 'main.html')
@@ -46,11 +47,16 @@ class AddRegisteredEmailHandler(webapp.RequestHandler):
       success = True
       try:
         # can't not remember to validate email
-        newEmail.emailAddress = self.request.get('emailAddress')
+        tempEmailString = self.request.get('emailAddress')
+        newEmail.emailAddress = tempEmailString
+        # WHY DOESN'T THIS WORK? I SUCK. -OTAVIO
+        if not mail.is_email_valid(tempEmailString):
+          success = False
       except:
         success = False
       else:
-        newEmail.put()
+        if success:
+          newEmail.put()
     self.redirect('/registerEmail')
 
 
