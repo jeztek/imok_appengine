@@ -5,8 +5,8 @@ import re
 
 class ImokUser(db.Model):
   account = db.UserProperty()
-  firstName = db.StringProperty()
-  lastName = db.StringProperty()
+  firstName = db.StringProperty(verbose_name='First name')
+  lastName = db.StringProperty(verbose_name='Last name')
 
 class Phone(db.Model):
   """
@@ -16,10 +16,10 @@ class Phone(db.Model):
   we display them like so: AAA-BBB-CCCC
   """
   user = db.UserProperty()           # Who this number belongs to
-  name = db.StringProperty()         # Nickname for the phone
+  name = db.StringProperty(default='default')         # Nickname for the phone
   number = db.StringProperty()       # Phone number
-  verified = db.BooleanProperty()    # Whether they have verified it or not
-  code = db.StringProperty()         # Verification code
+  verified = db.BooleanProperty(default=False)    # Whether they have verified it or not
+  code = db.StringProperty(default='')         # Verification code
 
   @classmethod
   def is_valid_number(cls, number):
