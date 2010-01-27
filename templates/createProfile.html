@@ -1,13 +1,12 @@
 {% extends "base.html" %}
 
 {% block body %}
-Welcome, {{ username }}.  To begin using <i>I'm OK</i>,
-we'll need some more information about you.
+
+<p>Welcome, {{ username }}.  To begin using <i>I'm OK</i>,
+we'll need some more information about you.</p>
 
 <form method="post" action="/profile/create">
-<table>
-{{ form }}
-</table>
+{{ form.as_p }}
 <input type="submit" value="Submit">
 </form>
 {% endblock body %}

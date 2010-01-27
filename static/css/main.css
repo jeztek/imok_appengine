@@ -88,3 +88,8 @@ input[type=submit] {
     font-size: 18px;
     padding: 5px;
 }
+
+.errorlist {
+  font-weight: bold;
+  color: red;
+}
