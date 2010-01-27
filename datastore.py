@@ -3,9 +3,16 @@ from google.appengine.ext import db
 class ImokUser(db.Model):
   account = db.UserProperty()
 
+class Phone(db.Model):
+  user = db.UserProperty()           # Who this number belongs to
+  name = db.StringProperty()         # Nickname for the phone
+  number = db.PhoneNumberProperty()  # Phone number
+  verified = db.BooleanProperty()    # Whether they have verified it or not
+  code = db.StringProperty()         # Verification code
+
 class RegisteredEmail(db.Model):
-  userName = db.UserProperty()
-  emailAddress = db.EmailProperty()
+  userName = db.UserProperty()       # Who this email belongs to
+  emailAddress = db.EmailProperty()  # The email address
 
 class Post(db.Model):
   user 	   = db.UserProperty()
