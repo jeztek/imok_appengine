@@ -20,5 +20,9 @@ handlers:
 - url: /incoming/.*
   script: incoming.py
 
+- url: /tasks/.*
+  script: tasks.py
+  login: admin
+
 - url: .*
   script: main.py

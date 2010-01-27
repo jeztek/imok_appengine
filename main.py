@@ -4,14 +4,11 @@ from google.appengine.api import users
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template, util
 from google.appengine.ext.webapp.util import login_required
-from google.appengine.ext import db
 from google.appengine.api import mail
 
+import settings as s
 
-class RegisteredEmail(db.Model):
-  userName = db.UserProperty()
-  emailAddress = db.EmailProperty()
-
+from datastore import *
 
 class MainHandler(webapp.RequestHandler):
   @login_required
@@ -21,7 +18,7 @@ class MainHandler(webapp.RequestHandler):
     username = user.nickname()
     logout_url = users.create_logout_url("/")
 
-    template_path = os.path.join(os.path.dirname(__file__), 'main.html')
+    template_path = s.template_path('main.html')
     self.response.headers['Content-Type'] = 'text/html'
     self.response.out.write(template.render(template_path, locals()))
 
@@ -34,7 +31,7 @@ class RegisterEmailHandler(webapp.RequestHandler):
     
     logout_url = users.create_logout_url("/")
 
-    template_path = os.path.join(os.path.dirname(__file__), 'registerEmail.html')
+    template_path = s.template_path('register_email.html')
     self.response.headers['Content-Type'] = 'text/html'
     self.response.out.write(template.render(template_path, locals()))
 
@@ -57,7 +54,7 @@ class AddRegisteredEmailHandler(webapp.RequestHandler):
       else:
         if success:
           newEmail.put()
-    self.redirect('/registerEmail')
+    self.redirect('/email')
 
 
 class RemoveRegisteredEmailHandler(webapp.RequestHandler):
@@ -69,7 +66,7 @@ class RemoveRegisteredEmailHandler(webapp.RequestHandler):
       if removeEmailList:
         removeEmailList.delete()
         
-    self.redirect('/registerEmail')
+    self.redirect('/email')
 
 
 class SpamAllRegisteredEmailsHandler(webapp.RequestHandler):
@@ -95,16 +92,16 @@ Please let us know if you have any questions.
 
 The ImOK.com Team
 """)
-    self.redirect('/registerEmail')
+    self.redirect('/email')
     
     
 def main():
   application = webapp.WSGIApplication([
     ('/', MainHandler),
-    ('/registerEmail', RegisterEmailHandler),
-    ('/addRegisteredEmail', AddRegisteredEmailHandler),
-    ('/removeRegisteredEmail', RemoveRegisteredEmailHandler),
-    ('/spamAllRegisteredEmails', SpamAllRegisteredEmailsHandler),
+    ('/email', RegisterEmailHandler),
+    ('/email/add', AddRegisteredEmailHandler),
+    ('/email/remove', RemoveRegisteredEmailHandler),
+    ('/email/spam', SpamAllRegisteredEmailsHandler),
                                         
   ], debug=True)
   util.run_wsgi_app(application)

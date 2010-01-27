@@ -3,6 +3,10 @@ from google.appengine.ext import db
 class ImokUser(db.Model):
   account = db.UserProperty()
 
+class RegisteredEmail(db.Model):
+  userName = db.UserProperty()
+  emailAddress = db.EmailProperty()
+
 class Post(db.Model):
   user 	   = db.UserProperty()
   datetime = db.DateTimeProperty(auto_now_add=True)
