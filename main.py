@@ -14,12 +14,17 @@ class RegisteredEmail(db.Model):
 
 
 class MainHandler(webapp.RequestHandler):
-  @login_required
   def get(self):
 
-    user = users.get_current_user()
-    username = user.nickname()
-    logout_url = users.create_logout_url("/")
+#    user = users.get_current_user()
+#    username = user.nickname()
+    if users.get_current_user():
+        url = users.create_logout_url("/")
+        url_linktext = 'Logout'
+    else:
+        url = users.create_login_url(self.request.uri)
+        url_linktext = 'Login'
+        mustLogIn = "True"; # this is so the navigation bar only shows the relevant things.
 
     template_path = os.path.join(os.path.dirname(__file__), 'main.html')
     self.response.headers['Content-Type'] = 'text/html'
@@ -32,7 +37,8 @@ class RegisterEmailHandler(webapp.RequestHandler):
     registeredEmailQuery = RegisteredEmail.all().filter('userName =', users.get_current_user()).order('emailAddress')
     registeredEmailList = registeredEmailQuery.fetch(100)
     
-    logout_url = users.create_logout_url("/")
+    url = users.create_logout_url("/")
+    url_linktext = 'Logout'
 
     template_path = os.path.join(os.path.dirname(__file__), 'registerEmail.html')
     self.response.headers['Content-Type'] = 'text/html'
@@ -49,14 +55,14 @@ class AddRegisteredEmailHandler(webapp.RequestHandler):
         # can't not remember to validate email
         tempEmailString = self.request.get('emailAddress')
         newEmail.emailAddress = tempEmailString
-        # WHY DOESN'T THIS WORK? I SUCK. -OTAVIO
+        # WHY DOESN'T THIS WORK? I SUCK. do I need a real mail server for this? -OTAVIO
         if not mail.is_email_valid(tempEmailString):
           success = False
       except:
         success = False
       else:
         if success:
-          newEmail.put()
+          newEmail.put()    # this should have error correction so it doesn't go over 100.
     self.redirect('/registerEmail')
 
 
