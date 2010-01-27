@@ -1,9 +1,12 @@
+
 from google.appengine.ext import db
 
 import re
 
 class ImokUser(db.Model):
   account = db.UserProperty()
+  firstName = db.StringProperty()
+  lastName = db.StringProperty()
 
 class Phone(db.Model):
   """
