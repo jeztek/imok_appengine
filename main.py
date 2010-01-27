@@ -6,6 +6,14 @@ from google.appengine.ext.webapp import template, util
 from google.appengine.ext.webapp.util import login_required
 from google.appengine.api import mail
 
+# must import template before importing django stuff
+from google.appengine.ext.db import djangoforms
+try:
+  from django import newforms as forms
+except ImportError:
+  from django import forms
+import django.core.exceptions
+
 import settings as s
 from datastore import *
 
@@ -14,6 +22,71 @@ class IntroHandler(webapp.RequestHandler):
     template_path = s.template_path('intro.html')
     self.response.headers['Content-Type'] = 'text/html'
     self.response.out.write(template.render(template_path, locals()))
+
+class PhoneField(forms.CharField):
+  def __init__(self, *args, **kwargs):
+    kwargs['max_length'] = 12
+    super(PhoneField, self).__init__(*args, **kwargs)
+
+  def clean(self, value):
+    cleanNumber = re.sub(r'\D+', '', value) # ignore punctuation
+    if len(cleanNumber) == 10:
+      return "+1%s" % cleanNumber
+    elif len(cleanNumber) == 11 and cleanNumber.startswith('1'):
+      return "+%s" % cleanNumber
+    else:
+      raise forms.ValidationError('Please enter a valid 10-digit US phone number')
+
+class UserProfileForm(djangoforms.ModelForm):
+  phone = PhoneField()
+  class Meta:
+    model = ImokUser
+    exclude = ['account']
+
+class RequestHandlerPlus(webapp.RequestHandler):
+  def render(self, tmplName, tmplValues, contentType='text/html'):
+    self.response.headers['Content-Type'] = contentType
+    self.response.out.write(template.render(s.template_path(tmplName), tmplValues))
+
+class CreateProfileHandler(RequestHandlerPlus):
+  def getProfile(self):
+    # Annoying that we can't use django get_or_create() idiom here.  the
+    # appengine equivalent get_or_insert() seems to allow querying by
+    # key only.  I also ran into problems trying to wrap this in a
+    # transaction.
+    user = users.get_current_user()
+    profiles = ImokUser.all().filter('account =', user).fetch(1)
+    if profiles:
+      profile = profiles[0]
+    else:
+      profile = ImokUser(account=user)
+    return profile
+
+  @login_required
+  def get(self):
+    user = users.get_current_user()
+    username = user.nickname()
+    logout_url = users.create_logout_url("/")
+    profile = self.getProfile()
+    form = UserProfileForm(instance=profile)
+    self.render('createProfile.html', locals())
+
+  def post(self):
+    user = users.get_current_user()
+    username = user.nickname()
+    logout_url = users.create_logout_url("/")
+    profile = self.getProfile()
+    form = UserProfileForm(data=self.request.POST, instance=profile)
+    if form.is_valid():
+      # Save the data and redirect to home
+      editedProfile = form.save(commit=False)
+      editedProfile.put()
+      defaultPhone = Phone(user=user, number=form._cleaned_data()['phone'])
+      defaultPhone.put()
+      self.redirect('/home')
+    else:
+      # Reprint the form
+      self.render('createProfile.html', locals())
 
 class HomeHandler(webapp.RequestHandler):
   @login_required
@@ -108,6 +181,7 @@ def main():
     ('/email/add', AddRegisteredEmailHandler),
     ('/email/remove', RemoveRegisteredEmailHandler),
     ('/email/spam', SpamAllRegisteredEmailsHandler),
+    ('/profile/create', CreateProfileHandler),
                                         
   ], debug=True)
   util.run_wsgi_app(application)
