@@ -1,7 +1,7 @@
 
 from google.appengine.ext import db
 
-import re
+import re, random
 
 class ImokUser(db.Model):
   account = db.UserProperty()
@@ -20,6 +20,7 @@ class Phone(db.Model):
   number = db.StringProperty()       # Phone number
   verified = db.BooleanProperty(default=False)    # Whether they have verified it or not
   code = db.StringProperty(default='')         # Verification code
+  code_time = db.DateTimeProperty()
 
   @classmethod
   def is_valid_number(cls, number):
@@ -30,7 +31,13 @@ class Phone(db.Model):
   @classmethod
   def normalize_number(cls, number):
     clean_number = re.sub(r'\D+', '', number)
+    if len(clean_number) == 10:
+      return "+1%s" % clean_number
     return "+%s" % clean_number
+
+  @classmethod
+  def generate_code(cls):
+    return str(random.randrange(1111, 9999))
 
   def number_str(self):
     return re.sub(r'\+(\d{1})(\d{3})(\d{3})(\d{4})', '\g<2>-\g<3>-\g<4>', self.number)

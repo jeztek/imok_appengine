@@ -110,3 +110,8 @@ input[type=submit] {
 #nav-global li { display:block; float:left; list-style-type:none; margin:0; padding:0; }
 #nav-global a { color:#ffef00; display:block; float:left; padding:5em 16px 10px 16px; background:#600000; }
 #nav-global a:hover { color:white; background:#04351d; }
+=======
+.errorlist {
+  font-weight: bold;
+  color: red;
+}
