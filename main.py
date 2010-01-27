@@ -7,10 +7,15 @@ from google.appengine.ext.webapp.util import login_required
 from google.appengine.api import mail
 
 import settings as s
-
 from datastore import *
 
-class MainHandler(webapp.RequestHandler):
+class IntroHandler(webapp.RequestHandler):
+  def get(self):
+    template_path = s.template_path('intro.html')
+    self.response.headers['Content-Type'] = 'text/html'
+    self.response.out.write(template.render(template_path, locals()))
+
+class HomeHandler(webapp.RequestHandler):
   @login_required
   def get(self):
 
@@ -97,7 +102,8 @@ The ImOK.com Team
     
 def main():
   application = webapp.WSGIApplication([
-    ('/', MainHandler),
+    ('/', IntroHandler),
+    ('/home', HomeHandler),
     ('/email', RegisterEmailHandler),
     ('/email/add', AddRegisteredEmailHandler),
     ('/email/remove', RemoveRegisteredEmailHandler),
