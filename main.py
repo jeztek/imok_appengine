@@ -4,16 +4,19 @@ from google.appengine.api import users
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template, util
 from google.appengine.ext.webapp.util import login_required
-from google.appengine.ext import db
 from google.appengine.api import mail
 
+import settings as s
+from datastore import *
 
-class RegisteredEmail(db.Model):
-  userName = db.UserProperty()
-  emailAddress = db.EmailProperty()
-
+class IntroHandler(webapp.RequestHandler):
+  def get(self):
+    template_path = s.template_path('intro.html')
+    self.response.headers['Content-Type'] = 'text/html'
+    self.response.out.write(template.render(template_path, locals()))
 
 class MainHandler(webapp.RequestHandler):
+  @login_required
   def get(self):
 
 #    user = users.get_current_user()
@@ -26,7 +29,7 @@ class MainHandler(webapp.RequestHandler):
         url_linktext = 'Login'
         mustLogIn = "True"; # this is so the navigation bar only shows the relevant things.
 
-    template_path = os.path.join(os.path.dirname(__file__), 'main.html')
+    template_path = s.template_path('main.html')
     self.response.headers['Content-Type'] = 'text/html'
     self.response.out.write(template.render(template_path, locals()))
 
@@ -40,7 +43,7 @@ class RegisterEmailHandler(webapp.RequestHandler):
     url = users.create_logout_url("/")
     url_linktext = 'Logout'
 
-    template_path = os.path.join(os.path.dirname(__file__), 'registerEmail.html')
+    template_path = s.template_path('register_email.html')
     self.response.headers['Content-Type'] = 'text/html'
     self.response.out.write(template.render(template_path, locals()))
 
@@ -62,8 +65,8 @@ class AddRegisteredEmailHandler(webapp.RequestHandler):
         success = False
       else:
         if success:
-          newEmail.put()    # this should have error correction so it doesn't go over 100.
-    self.redirect('/registerEmail')
+          newEmail.put()
+    self.redirect('/email')
 
 
 class RemoveRegisteredEmailHandler(webapp.RequestHandler):
@@ -75,7 +78,7 @@ class RemoveRegisteredEmailHandler(webapp.RequestHandler):
       if removeEmailList:
         removeEmailList.delete()
         
-    self.redirect('/registerEmail')
+    self.redirect('/email')
 
 
 class SpamAllRegisteredEmailsHandler(webapp.RequestHandler):
@@ -101,16 +104,17 @@ Please let us know if you have any questions.
 
 The ImOK.com Team
 """)
-    self.redirect('/registerEmail')
+    self.redirect('/email')
     
     
 def main():
   application = webapp.WSGIApplication([
-    ('/', MainHandler),
-    ('/registerEmail', RegisterEmailHandler),
-    ('/addRegisteredEmail', AddRegisteredEmailHandler),
-    ('/removeRegisteredEmail', RemoveRegisteredEmailHandler),
-    ('/spamAllRegisteredEmails', SpamAllRegisteredEmailsHandler),
+    ('/', IntroHandler),
+    ('/home', HomeHandler),
+    ('/email', RegisterEmailHandler),
+    ('/email/add', AddRegisteredEmailHandler),
+    ('/email/remove', RemoveRegisteredEmailHandler),
+    ('/email/spam', SpamAllRegisteredEmailsHandler),
                                         
   ], debug=True)
   util.run_wsgi_app(application)

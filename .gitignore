@@ -3,4 +3,7 @@
 *.pyc
 .DS_Store
 index.yaml
+googlevoice/local_settings.py
+googlevoice/gv_settings
 main.app/
+
