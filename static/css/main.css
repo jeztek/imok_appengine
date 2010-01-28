@@ -119,3 +119,7 @@ input[type=submit] {
 .biglink {
   font-size: 1.2em;
 }
+
+table .messagePost {
+  border-width: 1px;
+}

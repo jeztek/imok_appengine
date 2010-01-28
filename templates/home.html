@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+This is where we explain all about I'm OK! and how it works.<br/>
+
+To get started, login, register yourself a phone number, and then register some emails.<br/>
+
+<br/><a href="/email">Register an email address</a><br/>
+
+<p><b>History of messages you posted:</b></p>
+
+{% if posts %}
+<table class="messagePost">
+  <tr>
+    <th class="messagePost">Time</th>
+    <th class="messagePost">Position</th>
+    <th class="messagePost">Message</th>
+  </tr>
+{% for post in posts %}
+  {{ post.asTableRow }}
+{% endfor %}
+</table>
+{% else %}
+[You haven't posted any messages yet]
+{% endif %}
+
+{% endblock body %}
