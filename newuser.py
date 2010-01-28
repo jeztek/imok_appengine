@@ -17,10 +17,34 @@ import django.core.exceptions
 import settings
 from datastore import *
 from imokutils import *
+from imokforms import *
 
 class NewUserProfileHandler(RequestHandlerPlus):
+  @login_required
   def get(self):
+    user = users.get_current_user()
+    username = user.nickname()
+    logout_url = users.create_logout_url("/")
+    profile = getProfile(True)
+    form = UserProfileForm(instance=profile)
     self.render('newUserProfile.html', locals())
+
+  def post(self):
+    user = users.get_current_user()
+    username = user.nickname()
+    logout_url = users.create_logout_url("/")
+    profile = getProfile(True)
+    form = UserProfileForm(data=self.request.POST, instance=profile)
+    if form.is_valid():
+      # Save the data and redirect to home
+      editedProfile = form.save(commit=False)
+      editedProfile.put()
+      defaultPhone = Phone(user=user, number=form._cleaned_data()['phone'])
+      defaultPhone.put()
+      self.redirect('/home')
+    else:
+      # Reprint the form
+      self.render('newUserProfile.html', locals())
 
 class NewUserVerifyPhoneHandler(RequestHandlerPlus):
   def get(self):

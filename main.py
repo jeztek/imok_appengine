@@ -63,7 +63,7 @@ class HomeHandler(RequestHandlerPlus):
     user = users.get_current_user()
     profile = getProfile()
     if not profile:
-        self.redirect('/profile/create')
+        self.redirect('/newuser/profile')
     postsQuery = Post.all().filter('user = ', user).order('-datetime')
     posts = postsQuery.fetch(10)
     isMorePosts = postsQuery.count() > 10
