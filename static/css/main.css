@@ -106,7 +106,7 @@ input[type=submit] {
 
 /* NAV */
 
-#nav-global { position:absolute; margin:0; bottom:0; right:0px; white-space:nowrap; }
+#nav-global { position:absolute; margin:0; bottom:0; right:0px; white-space:nowrap; font-weight:bold; font-size:14px; }
 #nav-global li { display:block; float:left; list-style-type:none; margin:0; padding:0; }
 #nav-global a { color:#ffef00; display:block; float:left; padding:5em 16px 10px 16px; background:#600000; }
 #nav-global a:hover { color:white; background:#04351d; }
