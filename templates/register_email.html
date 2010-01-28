@@ -8,7 +8,7 @@ These are the emails that you have already registered:<br/>
 <tr>
 	<td>Email: {{ registeredEmail.emailAddress }}</td>
 	<td><form action="/email/remove?emailAddress={{ registeredEmail.emailAddress|urlencode }}" method="post">
-	<input type="submit" value="Remove"/>
+	<input id="remove-button" type="submit" value="Remove"/>
 	</form></td>
 </tr>
 {% endfor %}
