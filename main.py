@@ -28,7 +28,7 @@ class IntroHandler(RequestHandlerPlus):
         login_url = users.create_login_url("/home")
         #loginOutUrl = users.create_login_url(self.request.uri)
 
-    self.render('intro.html', locals())
+    self.render('intro.html', self.getContext(locals()))
 
 class CreateProfileHandler(RequestHandlerPlus):
   @login_required
@@ -38,7 +38,7 @@ class CreateProfileHandler(RequestHandlerPlus):
     logout_url = users.create_logout_url("/")
     profile = getProfile(True)
     form = UserProfileForm(instance=profile)
-    self.render('createProfile.html', locals())
+    self.render('createProfile.html', self.getContext(locals()))
 
   def post(self):
     user = users.get_current_user()
@@ -55,7 +55,7 @@ class CreateProfileHandler(RequestHandlerPlus):
       self.redirect('/home')
     else:
       # Reprint the form
-      self.render('createProfile.html', locals())
+      self.render('createProfile.html', self.getContext(locals()))
 
 class HomeHandler(RequestHandlerPlus):
   @login_required
@@ -69,13 +69,11 @@ class HomeHandler(RequestHandlerPlus):
     isMorePosts = postsQuery.count() > 10
     logout_url = users.create_logout_url("/")
 
-    template_path = s.template_path('main.html')
-    self.response.headers['Content-Type'] = 'text/html'
-    self.response.out.write(template.render(template_path, locals()))
+    self.render('home.html', self.getContext(locals()))
 
 class GetInvolvedHandler(RequestHandlerPlus):
   def get(self):
-    self.render('getInvolved.html', locals())
+    self.render('getInvolved.html', self.getContext(locals()))
 
 class RegisterEmailHandler(RequestHandlerPlus):
   @login_required
@@ -85,7 +83,7 @@ class RegisterEmailHandler(RequestHandlerPlus):
     
     logout_url = users.create_logout_url("/")
 
-    self.render('register_email.html', locals())
+    self.render('register_email.html', self.getContext(locals()))
 
 class AddRegisteredEmailHandler(RequestHandlerPlus):
   def post(self):
@@ -149,7 +147,7 @@ class DownloadsHandler(RequestHandlerPlus):
   def get(self):
     logout_url = users.create_logout_url("/")
 
-    self.render('downloads.html', locals())
+    self.render('downloads.html', self.getContext(locals()))
     
 def main():
   application = webapp.WSGIApplication([
