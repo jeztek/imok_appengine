@@ -45,36 +45,41 @@ class PhoneField(forms.CharField):
       raise forms.ValidationError('Please enter a valid 10-digit US phone number')
 
 class UserProfileForm(djangoforms.ModelForm):
-  phone = PhoneField()
+  phone = PhoneField(label="Phone number*")
   class Meta:
     model = ImokUser
     exclude = ['account']
 
+def getProfile(createIfNeeded=False):
+  # Annoying that we can't use django get_or_create() idiom here.  the
+  # appengine equivalent get_or_insert() seems to allow querying by
+  # key only.  I also ran into problems trying to wrap this in a
+  # transaction.
+  user = users.get_current_user()
+  profiles = ImokUser.all().filter('account =', user).fetch(1)
+  if profiles:
+    profile = profiles[0]
+  else:
+    if createIfNeeded:
+      profile = ImokUser(account=user)
+    else:
+      profile = None
+  return profile
+
 class RequestHandlerPlus(webapp.RequestHandler):
+  """Place to put convenience functions used by multiple request handlers."""
+
   def render(self, tmplName, tmplValues, contentType='text/html'):
     self.response.headers['Content-Type'] = contentType
     self.response.out.write(template.render(s.template_path(tmplName), tmplValues))
 
 class CreateProfileHandler(RequestHandlerPlus):
-  def getProfile(self):
-    # Annoying that we can't use django get_or_create() idiom here.  the
-    # appengine equivalent get_or_insert() seems to allow querying by
-    # key only.  I also ran into problems trying to wrap this in a
-    # transaction.
-    user = users.get_current_user()
-    profiles = ImokUser.all().filter('account =', user).fetch(1)
-    if profiles:
-      profile = profiles[0]
-    else:
-      profile = ImokUser(account=user)
-    return profile
-
   @login_required
   def get(self):
     user = users.get_current_user()
     username = user.nickname()
     logout_url = users.create_logout_url("/")
-    profile = self.getProfile()
+    profile = getProfile(True)
     form = UserProfileForm(instance=profile)
     self.render('createProfile.html', locals())
 
@@ -82,7 +87,7 @@ class CreateProfileHandler(RequestHandlerPlus):
     user = users.get_current_user()
     username = user.nickname()
     logout_url = users.create_logout_url("/")
-    profile = self.getProfile()
+    profile = getProfile(True)
     form = UserProfileForm(data=self.request.POST, instance=profile)
     if form.is_valid():
       # Save the data and redirect to home
@@ -95,14 +100,14 @@ class CreateProfileHandler(RequestHandlerPlus):
       # Reprint the form
       self.render('createProfile.html', locals())
 
-class HomeHandler(webapp.RequestHandler):
+class HomeHandler(RequestHandlerPlus):
   @login_required
   def get(self):
+    profile = getProfile()
+    if not profile:
+        self.redirect('/profile/create')
     logout_url = users.create_logout_url("/")
-
-    template_path = s.template_path('main.html')
-    self.response.headers['Content-Type'] = 'text/html'
-    self.response.out.write(template.render(template_path, locals()))
+    self.render('main.html', locals())
 
 class GetInvolvedHandler(RequestHandlerPlus):
   def get(self):
