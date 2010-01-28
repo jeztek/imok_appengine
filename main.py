@@ -14,64 +14,21 @@ except ImportError:
   from django import forms
 import django.core.exceptions
 
-import settings as s
+import settings
 from datastore import *
+from imokutils import *
+from imokforms import *
 
-class IntroHandler(webapp.RequestHandler):
+class IntroHandler(RequestHandlerPlus):
   def get(self):
     if users.get_current_user():
         logout_url = users.create_logout_url("/")
     else:
         mustLogIn = "True" # this is so the navigation bar only shows the relevant things.
         login_url = users.create_login_url("/home")
-#        loginOutUrl = users.create_login_url(self.request.uri)
+        #loginOutUrl = users.create_login_url(self.request.uri)
 
-    template_path = s.template_path('intro.html')
-    self.response.headers['Content-Type'] = 'text/html'
-    self.response.out.write(template.render(template_path, locals()))
-
-class PhoneField(forms.CharField):
-  def __init__(self, *args, **kwargs):
-    kwargs['max_length'] = 12
-    super(PhoneField, self).__init__(*args, **kwargs)
-
-  def clean(self, value):
-    cleanNumber = re.sub(r'\D+', '', value) # ignore punctuation
-    if len(cleanNumber) == 10:
-      return "+1%s" % cleanNumber
-    elif len(cleanNumber) == 11 and cleanNumber.startswith('1'):
-      return "+%s" % cleanNumber
-    else:
-      raise forms.ValidationError('Please enter a valid 10-digit US phone number')
-
-class UserProfileForm(djangoforms.ModelForm):
-  phone = PhoneField(label="Phone number*")
-  class Meta:
-    model = ImokUser
-    exclude = ['account']
-
-def getProfile(createIfNeeded=False):
-  # Annoying that we can't use django get_or_create() idiom here.  the
-  # appengine equivalent get_or_insert() seems to allow querying by
-  # key only.  I also ran into problems trying to wrap this in a
-  # transaction.
-  user = users.get_current_user()
-  profiles = ImokUser.all().filter('account =', user).fetch(1)
-  if profiles:
-    profile = profiles[0]
-  else:
-    if createIfNeeded:
-      profile = ImokUser(account=user)
-    else:
-      profile = None
-  return profile
-
-class RequestHandlerPlus(webapp.RequestHandler):
-  """Place to put convenience functions used by multiple request handlers."""
-
-  def render(self, tmplName, tmplValues, contentType='text/html'):
-    self.response.headers['Content-Type'] = contentType
-    self.response.out.write(template.render(s.template_path(tmplName), tmplValues))
+    self.render('intro.html', locals())
 
 class CreateProfileHandler(RequestHandlerPlus):
   @login_required
@@ -103,17 +60,21 @@ class CreateProfileHandler(RequestHandlerPlus):
 class HomeHandler(RequestHandlerPlus):
   @login_required
   def get(self):
+    user = users.get_current_user()
     profile = getProfile()
     if not profile:
         self.redirect('/profile/create')
+    postsQuery = Post.all().filter('user = ', user).order('-datetime')
+    posts = postsQuery.fetch(10)
+    isMorePosts = postsQuery.count() > 10
     logout_url = users.create_logout_url("/")
-    self.render('main.html', locals())
+    self.render('home.html', locals())
 
 class GetInvolvedHandler(RequestHandlerPlus):
   def get(self):
     self.render('getInvolved.html', locals())
 
-class RegisterEmailHandler(webapp.RequestHandler):
+class RegisterEmailHandler(RequestHandlerPlus):
   @login_required
   def get(self):
     registeredEmailQuery = RegisteredEmail.all().filter('userName =', users.get_current_user()).order('emailAddress')
@@ -121,12 +82,9 @@ class RegisterEmailHandler(webapp.RequestHandler):
     
     logout_url = users.create_logout_url("/")
 
-    template_path = s.template_path('register_email.html')
-    self.response.headers['Content-Type'] = 'text/html'
-    self.response.out.write(template.render(template_path, locals()))
+    self.render('register_email.html', locals())
 
-
-class AddRegisteredEmailHandler(webapp.RequestHandler):
+class AddRegisteredEmailHandler(RequestHandlerPlus):
   def post(self):
     if users.get_current_user():
       newEmail = RegisteredEmail()
@@ -146,8 +104,7 @@ class AddRegisteredEmailHandler(webapp.RequestHandler):
           newEmail.put()
     self.redirect('/email')
 
-
-class RemoveRegisteredEmailHandler(webapp.RequestHandler):
+class RemoveRegisteredEmailHandler(RequestHandlerPlus):
   def post(self):
     if users.get_current_user():
       removeEmail = self.request.get('emailAddress')
@@ -159,7 +116,7 @@ class RemoveRegisteredEmailHandler(webapp.RequestHandler):
     self.redirect('/email')
 
 
-class SpamAllRegisteredEmailsHandler(webapp.RequestHandler):
+class SpamAllRegisteredEmailsHandler(RequestHandlerPlus):
   def post(self):
     if users.get_current_user():
       registeredEmailQuery = RegisteredEmail.all().filter('userName =', users.get_current_user()).order('emailAddress')
@@ -184,15 +141,12 @@ The ImOK.com Team
 """)
     self.redirect('/email')
     
-class DownloadsHandler(webapp.RequestHandler):
+class DownloadsHandler(RequestHandlerPlus):
   @login_required
   def get(self):
     logout_url = users.create_logout_url("/")
 
-    template_path = s.template_path('downloads.html')
-    self.response.headers['Content-Type'] = 'text/html'
-    self.response.out.write(template.render(template_path, locals()))
-
+    self.render('downloads.html', locals())
     
 def main():
   application = webapp.WSGIApplication([
