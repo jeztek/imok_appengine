@@ -92,14 +92,23 @@ class HomeHandler(webapp.RequestHandler):
   @login_required
   def get(self):
 
-    user = users.get_current_user()
-    username = user.nickname()
-    logout_url = users.create_logout_url("/")
+#    user = users.get_current_user()
+#    username = user.nickname()
+    if users.get_current_user():
+        url = users.create_logout_url("/")
+        url_linktext = 'Logout'
+    else:
+        url = users.create_login_url(self.request.uri)
+        url_linktext = 'Login'
+        mustLogIn = "True"; # this is so the navigation bar only shows the relevant things.
 
     template_path = s.template_path('main.html')
     self.response.headers['Content-Type'] = 'text/html'
     self.response.out.write(template.render(template_path, locals()))
 
+class GetInvolvedHandler(RequestHandlerPlus):
+  def get(self):
+    self.render('getInvolved.html', locals())
 
 class RegisterEmailHandler(webapp.RequestHandler):
   @login_required
@@ -107,7 +116,8 @@ class RegisterEmailHandler(webapp.RequestHandler):
     registeredEmailQuery = RegisteredEmail.all().filter('userName =', users.get_current_user()).order('emailAddress')
     registeredEmailList = registeredEmailQuery.fetch(100)
     
-    logout_url = users.create_logout_url("/")
+    url = users.create_logout_url("/")
+    url_linktext = 'Logout'
 
     template_path = s.template_path('register_email.html')
     self.response.headers['Content-Type'] = 'text/html'
@@ -124,7 +134,7 @@ class AddRegisteredEmailHandler(webapp.RequestHandler):
         # can't not remember to validate email
         tempEmailString = self.request.get('emailAddress')
         newEmail.emailAddress = tempEmailString
-        # WHY DOESN'T THIS WORK? I SUCK. -OTAVIO
+        # WHY DOESN'T THIS WORK? I SUCK. do I need a real mail server for this? -OTAVIO
         if not mail.is_email_valid(tempEmailString):
           success = False
       except:
@@ -177,12 +187,12 @@ def main():
   application = webapp.WSGIApplication([
     ('/', IntroHandler),
     ('/home', HomeHandler),
+    ('/getInvolved', GetInvolvedHandler),
     ('/email', RegisterEmailHandler),
     ('/email/add', AddRegisteredEmailHandler),
     ('/email/remove', RemoveRegisteredEmailHandler),
     ('/email/spam', SpamAllRegisteredEmailsHandler),
     ('/profile/create', CreateProfileHandler),
-                                        
   ], debug=True)
   util.run_wsgi_app(application)
 
