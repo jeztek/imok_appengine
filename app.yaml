@@ -17,6 +17,10 @@ handlers:
   static_dir: static/img
   mime_type: image/png
 
+- url: /static/pdf
+  static_dir: static/pdf
+  mime_type: application/pdf
+
 - url: /incoming/.*
   script: incoming.py
 

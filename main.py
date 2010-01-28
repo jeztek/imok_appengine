@@ -106,6 +106,9 @@ class HomeHandler(webapp.RequestHandler):
     self.response.headers['Content-Type'] = 'text/html'
     self.response.out.write(template.render(template_path, locals()))
 
+class GetInvolvedHandler(RequestHandlerPlus):
+  def get(self):
+    self.render('getInvolved.html', locals())
 
 class RegisterEmailHandler(webapp.RequestHandler):
   @login_required
@@ -184,12 +187,12 @@ def main():
   application = webapp.WSGIApplication([
     ('/', IntroHandler),
     ('/home', HomeHandler),
+    ('/getInvolved', GetInvolvedHandler),
     ('/email', RegisterEmailHandler),
     ('/email/add', AddRegisteredEmailHandler),
     ('/email/remove', RemoveRegisteredEmailHandler),
     ('/email/spam', SpamAllRegisteredEmailsHandler),
     ('/profile/create', CreateProfileHandler),
-                                        
   ], debug=True)
   util.run_wsgi_app(application)
 

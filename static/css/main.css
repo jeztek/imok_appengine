@@ -115,3 +115,7 @@ input[type=submit] {
   font-weight: bold;
   color: red;
 }
+
+.biglink {
+  font-size: 1.2em;
+}
