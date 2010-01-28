@@ -27,7 +27,7 @@ class NewUserProfileHandler(RequestHandlerPlus):
     logout_url = users.create_logout_url("/")
     profile = getProfile(True)
     form = UserProfileForm(instance=profile)
-    self.render('newUserProfile.html', locals())
+    self.render('newUserProfile.html', self.getContext(locals()))
 
   def post(self):
     user = users.get_current_user()
@@ -41,18 +41,21 @@ class NewUserProfileHandler(RequestHandlerPlus):
       editedProfile.put()
       defaultPhone = Phone(user=user, number=form._cleaned_data()['phone'])
       defaultPhone.put()
-      self.redirect('/home')
+      self.redirect('/newuser/verifyPhone')
     else:
       # Reprint the form
-      self.render('newUserProfile.html', locals())
+      self.render('newUserProfile.html', self.getContext(locals()))
 
 class NewUserVerifyPhoneHandler(RequestHandlerPlus):
   def get(self):
-    self.render('newUserVerifyPhone.html', locals())
+    self.render('newUserVerifyPhone.html', self.getContext(locals()))
+
+  def post(self):
+    self.redirect('/newuser/contacts')
 
 class NewUserContactsHandler(RequestHandlerPlus):
   def get(self):
-    self.render('newUserContacts.html', locals())
+    self.render('newUserContacts.html', self.getContext(locals()))
 
 def main():
   application = webapp.WSGIApplication([

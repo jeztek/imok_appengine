@@ -25,6 +25,12 @@ def getProfile(createIfNeeded=False):
 class RequestHandlerPlus(webapp.RequestHandler):
   """Place to put convenience functions used by multiple request handlers."""
 
+  def getContext(self, localVars):
+      context = dict(user = users.get_current_user(),
+                     logout_url = users.create_logout_url("/"))
+      context.update(localVars)
+      return context
+
   def render(self, tmplName, tmplValues, contentType='text/html'):
     self.response.headers['Content-Type'] = contentType
     self.response.out.write(template.render(settings.template_path(tmplName), tmplValues))
