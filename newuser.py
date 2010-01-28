@@ -32,9 +32,9 @@ class NewUserContactsHandler(RequestHandlerPlus):
 
 def main():
   application = webapp.WSGIApplication([
-    ('/profile', NewUserProfileHandler),
-    ('/verifyPhone', NewUserVerifyPhoneHandler),
-    ('/contacts', NewUserContactsHandler),
+    ('/newuser/profile', NewUserProfileHandler),
+    ('/newuser/verifyPhone', NewUserVerifyPhoneHandler),
+    ('/newuser/contacts', NewUserContactsHandler),
   ], debug=True)
   util.run_wsgi_app(application)
 
