@@ -20,7 +20,7 @@ handlers:
 - url: /incoming/.*
   script: incoming.py
 
-- url: /phone/*
+- url: /phone/.*
   script: phone.py
 
 - url: /tasks/.*

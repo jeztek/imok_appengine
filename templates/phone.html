@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block body %}
+<p>{{ username }} [ <a href="{{ logout_url }}">Logout</a> ]</p>
+
+{% if message %}<div class="message">{{ message }}</div>{% endif %}
+
+<form name="register_phone" action="/phone/register" method="post">
+
+<table border="0">
+  <tr><th>Nickname</th><th>Number</th></tr>
+
+{% if phones %}
+  {% for phone in phones %}
+  <tr>
+    <td>{{ phone.name }}</td>
+    <td>{{ phone.number_str }}</td>
+    <td>
+      {% if not phone.verified %}
+      <a href="/phone/verify?id={{ phone.key }}">Verify</a>
+      {% endif %}
+    </td>
+  </tr>
+  {% endfor %}
+{% else %}
+  <tr><td colspan="3">No Phones Registered.</td></tr>
+{% endif %}
+
+  <tr>
+  <td><input type="text" name="phone_name" size="15" value="{{ nickname }}" /></td>
+  <td><input type="text" name="phone_number" size="12" value="{{ number }}">*</td >
+  <td><input type="submit" name="add" value="add"></td>
+  </tr>
+</table>
+<div>*Only US phone numbers are supported for now</div>
+
+</form>
+
+{% endblock body %}
