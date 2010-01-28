@@ -23,7 +23,7 @@ except ImportError:
 try:
     from json import loads
 except ImportError:
-    from simplejson import loads
+    from django.utils.simplejson import loads
 
 #try:
 #    input = raw_input
@@ -68,7 +68,7 @@ def load_and_validate(response):
     """
     Loads JSON data from http response then validates
     """
-    validate_response(loads(response.read()))
+    validate_response(loads(response.content))
 
 class ValidationError(Exception):
     """

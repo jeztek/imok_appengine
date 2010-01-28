@@ -3,6 +3,8 @@ from util import *
 import settings
 import os
 
+from appengine_util import URLOpener
+
 if settings.DEBUG:
     import logging
     logging.basicConfig()
@@ -17,7 +19,7 @@ class Voice(object):
     Handles login/logout and most of the baser HTTP methods
     """
     def __init__(self):
-        install_opener(build_opener(HTTPCookieProcessor(CookieJar())))
+        self.opener = URLOpener()
 
         for name in settings.FEEDS:
             setattr(self, name, self.__get_xml_page(name))
@@ -31,6 +33,7 @@ class Voice(object):
         """
         if hasattr(self, '_special') and getattr(self, '_special'):
             return self._special
+
         try:
             try:
                 regex = bytes("('_rnr_se':) '(.+)'", 'utf8')
@@ -38,8 +41,13 @@ class Voice(object):
                 regex = bytes("('_rnr_se':) '(.+)'")
         except NameError:
             regex = r"('_rnr_se':) '(.+)'"
+
         try:
-            sp = re.search(regex, urlopen(settings.INBOX).read()).group(2)
+            log.debug("Getting special")
+
+            response = self.__do_page('inbox')
+
+            sp = re.search(regex, response.content).group(2)
         except AttributeError:
             sp = None
         self._special = sp
@@ -64,10 +72,12 @@ class Voice(object):
         if passwd is None:
             raise NoCredentialsError
 
-        content = self.__do_page('login').read()
+        content = self.__do_page('login').content
         # holy hackjob
         galx = re.search(r"name=\"GALX\"\s+value=\"(.+)\"", content).group(1)
-        self.__do_page('login', {'Email': email, 'Passwd': passwd, 'GALX': galx})
+        self.__do_page('login', {'Email': email, 'Passwd': passwd, 'GALX': galx, 'PersistentCookie': 'yes', 'service': 'grandcentral' })
+
+        #self.__do_page('login', {'Email': email, 'Passwd': passwd, 'continue': settings.LOGIN_CONTINUE })
         
         del email, passwd
         
@@ -203,7 +213,7 @@ class Voice(object):
     ######################
     # Helper methods
     ######################
-    
+
     def __do_page(self, page, data=None, headers={}, force_get=False):
         """
         Loads a page out of the settings and pass it on to urllib Request
@@ -211,16 +221,29 @@ class Voice(object):
         page = page.upper()
         if isinstance(data, dict) or isinstance(data, tuple):
             data = urlencode(data)
-        headers.update({'User-Agent': 'PyGoogleVoice/0.5'})
+
         if log:
-            log.debug('%s?%s - %s' % (getattr(settings, page)[22:], data or '', headers))
+            log.debug('%s?%s - %s' % (getattr(settings, page), data or '', headers))
+
+        params = { 
+          'headers': headers
+        }
+
         if data and force_get:
-            return urlopen(Request(getattr(settings, page) + '?' + data, None, headers))
-        if page in ('DOWNLOAD','XML_SEARCH'):
-            return urlopen(Request(getattr(settings, page) + data, None, headers))
-        if data:
-            headers.update({'Content-type': 'application/x-www-form-urlencoded;charset=utf-8'})
-        return urlopen(Request(getattr(settings, page), data, headers))
+            params['url'] = getattr(settings, page) + '?' + data
+        elif page in ('DOWNLOAD','XML_SEARCH'):
+            params['url'] = getattr(settings, page) + data
+        else:
+            params['data'] = data
+        #elif data:
+        #    headers.update({'Content-type': 'application/x-www-form-urlencoded;charset=utf-8'})
+
+        params['url'] = getattr(settings, page)
+
+        response = self.opener.open(**params)
+        log.debug(response.headers)
+
+        return response
 
     def __validate_special_page(self, page, data={}, **kwargs):
         """
@@ -248,7 +271,7 @@ class Voice(object):
         """
         Return XMLParser instance generated from given page
         """
-        return XMLParser(self, page, lambda: self.__do_page('XML_%s' % page.upper(), data, headers, True).read())
+        return XMLParser(self, page, lambda: self.__do_page('XML_%s' % page.upper(), data, headers, True).content)
       
     def __messages_post(self, page, *msgs, **kwargs):
         """
