@@ -11,6 +11,7 @@ import settings as s
 from datastore import *
 
 from googlevoice import Voice
+import voice_pool
 
 class PhoneHandler(webapp.RequestHandler):
   @login_required
@@ -95,9 +96,8 @@ class SendVerificationHandler(webapp.RequestHandler):
       phone.code_time = datetime.datetime.now()
       phone.put()
 
-      v = Voice()
-      v.login()
-      v.send_sms(phone.number, phone.code)
+      v = voice_pool.get_voice()
+      v.send_sms(phone.number, "Verification Code: %s" % phone.code)
 
     except db.BadKeyError:
       self.error(400)
