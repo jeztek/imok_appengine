@@ -168,6 +168,23 @@ class DebugHandler(RequestHandlerPlus):
   def get(self):
     self.render('debug.html', self.getContext(locals()))
 
+def deleteAll(query):
+  count = query.count()
+  results = query.fetch(count)
+  db.delete(results)
+
+class ResetDbHandler(RequestHandlerPlus):
+  def post(self):
+    if users.is_current_user_admin():
+      deleteAll(ImokUser.all())
+      deleteAll(Phone.all())
+      deleteAll(RegisteredEmail.all())
+      deleteAll(Post.all())
+      self.render('resetdb.html', self.getContext(locals()))
+    else:
+      self.error(403)
+      self.response.out.write('403 Forbidden')
+
 def main():
   application = webapp.WSGIApplication([
     ('/', IntroHandler),
@@ -180,6 +197,7 @@ def main():
     ('/profile/create', CreateProfileHandler),
     ('/downloads', DownloadsHandler),
     ('/debug', DebugHandler),
+    ('/debug/resetdb', ResetDbHandler),
                                         
   ], debug=True)
   util.run_wsgi_app(application)

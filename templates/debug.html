@@ -2,10 +2,16 @@
 
 {% block body %}
 
-
-<form action="/email/spam" method="post">
-  Post an OK message
-  <input type="submit" value="Submit"/>
+<p>
+<form action="/debug/resetdb" method="post">
+  <input type="submit" value="Reset the data store"/>
 </form>
+</p>
+
+<p>
+<form action="/email/spam" method="post">
+  <input type="submit" value="Post an OK message"/>
+</form>
+</p>
 
 {% endblock body %}

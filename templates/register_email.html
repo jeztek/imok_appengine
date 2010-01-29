@@ -11,18 +11,19 @@
 	<div id="wizardContent">
 
 		<div>
-			<b>Add Contacts</b><br/>
-			<span style="font-size: 0.8em;">Enter emails of people who you'd like to notify with I'm OK!</span><br/><br/>
+			<b>Edit E-Mail Contacts</b><br/>
+			<span style="font-size: 0.8em;">Enter e-mails of people you'd like to notify with <i>I'm OK!</i></span><br/><br/>
 			<form action="/email/add?returnAddr=%2Femail" method="post">
 			<input type="text" value="email address" onclick="if (this.value == 'email address') {this.value = '';}" name="emailAddress"/>&nbsp;<input type="submit" value="Add"/><br>
 			</form>
 		</div>
 
 		<div>
+                        <br/>Current e-mail contacts:
 			<table>
 			{% for registeredEmail in registeredEmailList %}
 			<tr>
-				<td>{{ registeredEmail.emailAddress }}</td>
+				<td style="padding-left: 15px;">{{ registeredEmail.emailAddress }}</td>
 				<td><form action="/email/remove?emailAddress={{ registeredEmail.emailAddress|urlencode }}&returnAddr=%2Femail" method="post">
 				<input style="font-size: 0.9em; border-width: 0px;" class="removeLink" type="submit" value="Remove"/>
 				</form></td>
