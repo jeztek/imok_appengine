@@ -65,6 +65,10 @@ class HomeHandler(RequestHandlerPlus):
     if not profile:
         self.redirect('/newuser/profile')
 
+    # profile widget
+    phonesQuery = Phone.all().filter('user = ', user)
+    phones = phonesQuery.fetch(1)
+
     # emails widget
     emailsQuery = RegisteredEmail.all().filter('userName = ', user)
     emails = emailsQuery.fetch(3)

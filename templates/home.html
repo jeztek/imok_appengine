@@ -20,7 +20,7 @@ table.messagePost {
   border-width: 1px;
 }
 
-th.messagePost {
+table.messagePost th {
   font-weight: normal;
   font-style: italic;
   text-align: left;
@@ -28,18 +28,32 @@ th.messagePost {
   padding-right: 5px;
 }
 
-td.messagePost {
+table.messagePost td {
   text-align: left;
   padding-left: 5px;
   padding-right: 5px;
 }
 
 </style>
-{% endblock %}
+{% endblock head %}
 
 {% block body %}
 
 <table class="homeLayout"><tr><td class="homeLayout">
+
+<p class="homeWidgetTitle">Profile</p>
+
+<table class="profileWidget">
+<tr>
+  <th>Name:</th>
+  <td>{{ profile.firstName}} {{profile.lastName }}</td>
+</tr>
+{% for phone in phones %}
+<tr>
+  <th>Phone:</th>
+  <td>{{ phone }}</td>
+</tr>
+</table>
 
 <p class="homeWidgetTitle">E-mail contacts</p>
 
@@ -47,7 +61,7 @@ td.messagePost {
 be notified by e-mail.</div>
 {% if emails %}
   {% for email in emails %}
-    <div>{{ email }}{% if not forloop.last %},{% endif %}</div>
+    <div>{{ email.emailAddress }}{% if not forloop.last %},{% endif %}</div>
   {% endfor %}
   <div>... and {{ numEmailsNotShown }} more not shown.</div>
 {% else %}
@@ -63,9 +77,9 @@ be notified by e-mail.</div>
 {% if posts %}
 <table border="1" class="messagePost">
   <tr>
-    <th class="messagePost">Time</th>
-    <th class="messagePost">Position</th>
-    <th class="messagePost">Message</th>
+    <th>Time</th>
+    <th>Position</th>
+    <th>Message</th>
   </tr>
 {% for post in posts %}
   {{ post.asTableRow }}
