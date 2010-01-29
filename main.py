@@ -30,6 +30,17 @@ class IntroHandler(RequestHandlerPlus):
 
     self.render('intro.html', self.getContext(locals()))
 
+class AboutHandler(RequestHandlerPlus):
+  def get(self):
+    if users.get_current_user():
+        logout_url = users.create_logout_url("/")
+    else:
+        mustLogIn = "True" # this is so the navigation bar only shows the relevant things.
+        login_url = users.create_login_url("/home")
+        #loginOutUrl = users.create_login_url(self.request.uri)
+
+    self.render('about.html', self.getContext(locals()))
+
 class CreateProfileHandler(RequestHandlerPlus):
   @login_required
   def get(self):
@@ -161,7 +172,7 @@ The ImOK.com Team
 class DownloadsHandler(RequestHandlerPlus):
   @login_required
   def get(self):
-    self.render('downloads.html', self.getContext(locals()))
+    self.render('download.html', self.getContext(locals()))
     
 class DebugHandler(RequestHandlerPlus):
   @login_required
@@ -189,13 +200,14 @@ def main():
   application = webapp.WSGIApplication([
     ('/', IntroHandler),
     ('/home', HomeHandler),
+    ('/about', AboutHandler),
     ('/getInvolved', GetInvolvedHandler),
     ('/email', RegisterEmailHandler),
     ('/email/add', AddRegisteredEmailHandler),
     ('/email/remove', RemoveRegisteredEmailHandler),
     ('/email/spam', SpamAllRegisteredEmailsHandler),
     ('/profile/create', CreateProfileHandler),
-    ('/downloads', DownloadsHandler),
+    ('/download', DownloadsHandler),
     ('/debug', DebugHandler),
     ('/debug/resetdb', ResetDbHandler),
                                         

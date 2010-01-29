@@ -4,6 +4,7 @@
 <center>
 <div style="width:500px; text-align:left;">
 
+
 	<style>
 	.removeLink{background-color:transparent; padding: 0px; border-width: 0; font-size: 0.7em; border-color:transparent; cursor: pointer; text-decoration:underline; color:#0000FF; }
 
@@ -14,7 +15,7 @@
 			<b>Edit E-Mail Contacts</b><br/>
 			<span style="font-size: 0.8em;">Enter e-mails of people you'd like to notify with <i>I'm OK!</i></span><br/><br/>
 			<form action="/email/add?returnAddr=%2Femail" method="post">
-			<input type="text" value="email address" onclick="if (this.value == 'email address') {this.value = '';}" name="emailAddress"/>&nbsp;<input type="submit" value="Add"/><br>
+			<input type="text" value="email address" style="color: #999999;" onclick="if (this.value == 'email address') {this.value = ''; this.style.color = '#000000'; }" name="emailAddress"/>&nbsp;<input type="submit" value="Add"/><br>
 			</form>
 		</div>
 

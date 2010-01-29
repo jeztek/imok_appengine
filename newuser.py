@@ -66,11 +66,18 @@ class NewUserContactsHandler(RequestHandlerPlus):
     turnOnSelection3 = "selectedNavItem"
     self.render('newUserContacts.html', self.getContext(locals()))
 
+class NewUserDownloadHandler(RequestHandlerPlus):
+  @login_required
+  def get(self):
+    turnOnSelection4 = "selectedNavItem"
+    self.render('newUserDownload.html', self.getContext(locals()))
+
 def main():
   application = webapp.WSGIApplication([
     ('/newuser/profile', NewUserProfileHandler),
     ('/newuser/verifyPhone', NewUserVerifyPhoneHandler),
     ('/newuser/contacts', NewUserContactsHandler),
+    ('/newuser/download', NewUserDownloadHandler),
   ], debug=True)
   util.run_wsgi_app(application)
 
