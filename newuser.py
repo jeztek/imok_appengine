@@ -1,4 +1,4 @@
-import os, datetime
+import os, datetime, sys
 
 from google.appengine.api import users
 from google.appengine.ext import webapp
@@ -23,28 +23,27 @@ class NewUserProfileHandler(RequestHandlerPlus):
   @login_required
   def get(self):
     user = users.get_current_user()
-    username = user.nickname()
-    logout_url = users.create_logout_url("/")
     profile = getProfile(True)
-    form = UserProfileForm(instance=profile)
+    phone = getPhone()
+    if phone:
+      initial = dict(phoneNumber=phone.number_str())
+    else:
+      initial = None
+    form = UserProfileForm(instance=profile, initial=initial)
     turnOnSelection1 = "selectedNavItem"
     self.render('newUserProfile.html', self.getContext(locals()))
 
   def post(self):
     user = users.get_current_user()
-    username = user.nickname()
-    logout_url = users.create_logout_url("/")
     profile = getProfile(True)
     form = UserProfileForm(data=self.request.POST, instance=profile)
     if form.is_valid():
       # Save the data and redirect to home
-      editedProfile = form.save(commit=False)
-      editedProfile.put()
-      defaultPhone = Phone(user=user, number=form._cleaned_data()['phone'])
-      defaultPhone.put()
+      form.saveWithPhone()
       self.redirect('/newuser/verifyPhone')
     else:
       # Reprint the form
+      turnOnSelection1 = "selectedNavItem"
       self.render('newUserProfile.html', self.getContext(locals()))
 
 class NewUserVerifyPhoneHandler(RequestHandlerPlus):
@@ -65,11 +64,18 @@ class NewUserContactsHandler(RequestHandlerPlus):
     turnOnSelection3 = "selectedNavItem"
     self.render('newUserContacts.html', self.getContext(locals()))
 
+class NewUserDownloadHandler(RequestHandlerPlus):
+  @login_required
+  def get(self):
+    turnOnSelection4 = "selectedNavItem"
+    self.render('newUserDownload.html', self.getContext(locals()))
+
 def main():
   application = webapp.WSGIApplication([
     ('/newuser/profile', NewUserProfileHandler),
     ('/newuser/verifyPhone', NewUserVerifyPhoneHandler),
     ('/newuser/contacts', NewUserContactsHandler),
+    ('/newuser/download', NewUserDownloadHandler),
   ], debug=True)
   util.run_wsgi_app(application)
 

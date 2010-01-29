@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block body %}
+<center>
+<div style="width:500px; text-align:left;">
+	{% include "newUserNav.html" %}
+
+	<style>
+	.removeLink{background-color:transparent; padding: 0px; border-width: 0; font-size: 0.7em; border-color:transparent; cursor: pointer; text-decoration:underline; color:#0000FF; }
+
+	</style>
+	<div id="wizardContent">
+
+		<div>
+			<b>Download App</b><br/>
+			<span style="font-size: 0.8em;">PLACEHOLDER: Download the phone client apps</span><br/><br/>
+
+		<div class="nextButton">
+			<input type="submit" value="Finish" onclick="document.location = '/home';">
+		</div>
+		</div>
+
+	</div>
+
+</div>
+</center>
+{% endblock body %}

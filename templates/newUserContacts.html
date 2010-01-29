@@ -12,27 +12,30 @@
 	<div id="wizardContent">
 
 		<div>
-			<b>Add Contacts</b><br/>
-			<span style="font-size: 0.8em;">Enter emails of people who you'd like to notify with I'm OK!</span><br/><br/>
-			<form action="/email/add" method="post">
-			<input type="text" value="email address" onclick="if (this.value == 'email address') {this.value = '';}" name="emailAddress"/>&nbsp;<input type="submit" value="Add"/><br>
+			<b>Add E-Mail Contacts</b><br/>
+			<span style="font-size: 0.8em;">Enter e-mails of people you'd like to notify with <i>I'm OK!</i></span><br/><br/>
+			<form action="/email/add?returnAddr=%2Fnewuser%2Fcontacts" method="post">
+			<input type="text" value="email address" style="color: #999999;" onclick="if (this.value == 'email address') {this.value = ''; this.style.color = '#000000'; }" name="emailAddress"/>&nbsp;<input type="submit" value="Add"/><br>
 			</form>
 		</div>
 
 		<div>
+                        {% if registeredEmailList %}
+                        <br/>Current e-mail contacts:
 			<table>
 			{% for registeredEmail in registeredEmailList %}
 			<tr>
-				<td>{{ registeredEmail.emailAddress }}</td>
-				<td><form action="/email/remove?emailAddress={{ registeredEmail.emailAddress|urlencode }}" method="post">
+				<td style="padding-left: 15px;">{{ registeredEmail.emailAddress }}</td>
+				<td><form action="/email/remove?emailAddress={{ registeredEmail.emailAddress|urlencode }}&returnAddr=%2Fnewuser%2Fcontacts" method="post">
 				<input style="font-size: 0.9em; border-width: 0px;" class="removeLink" type="submit" value="Remove"/>
 				</form></td>
 			</tr>
 			{% endfor %}
 			</table>
+                        {% endif %}
 		</div>
 		<div class="nextButton">
-			<input type="submit" value="Finish" onclick="document.location = '/home';">
+			<input type="submit" value="Next" onclick="document.location = '/newuser/download';">
 		</div>
 	</div>
 </div>

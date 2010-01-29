@@ -3,7 +3,7 @@ from google.appengine.api import users
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template, util
 
-from datastore import ImokUser
+from datastore import ImokUser, Phone
 import settings
 
 def getProfile(createIfNeeded=False):
@@ -21,6 +21,20 @@ def getProfile(createIfNeeded=False):
     else:
       profile = None
   return profile
+
+def getPhone(createIfNeeded=False):
+  user = users.get_current_user()
+  phones = (Phone.all()
+            .filter('user = ', user)
+            .fetch(1))
+  if phones:
+    phone = phones[0]
+  else:
+    if createIfNeeded:
+      phone = Phone(user=user)
+    else:
+      phone = None
+  return phone
 
 class RequestHandlerPlus(webapp.RequestHandler):
   """Place to put convenience functions used by multiple request handlers."""

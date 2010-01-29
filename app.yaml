@@ -24,11 +24,15 @@ handlers:
 - url: /smsgateway/.*
   script: smsgateway.py
 
-- url: /phone/.*
-  script: phone.py
+- url: /tasks/.*
+  script: tasks.py
+  login: admin
 
 - url: /newuser/.*
   script: newuser.py
+
+- url: /debug.*
+  script: debug.py
 
 - url: .*
   script: main.py

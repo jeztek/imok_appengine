@@ -30,32 +30,43 @@ class IntroHandler(RequestHandlerPlus):
 
     self.render('intro.html', self.getContext(locals()))
 
-class CreateProfileHandler(RequestHandlerPlus):
+class AboutHandler(RequestHandlerPlus):
+  def get(self):
+    if users.get_current_user():
+        logout_url = users.create_logout_url("/")
+    else:
+        mustLogIn = "True" # this is so the navigation bar only shows the relevant things.
+        login_url = users.create_login_url("/home")
+        #loginOutUrl = users.create_login_url(self.request.uri)
+
+    self.render('about.html', self.getContext(locals()))
+
+class EditProfileHandler(RequestHandlerPlus):
   @login_required
   def get(self):
     user = users.get_current_user()
-    username = user.nickname()
-    logout_url = users.create_logout_url("/")
     profile = getProfile(True)
-    form = UserProfileForm(instance=profile)
-    self.render('createProfile.html', self.getContext(locals()))
+    phone = getPhone()
+    if phone:
+      initial = dict(phoneNumber=phone.number_str())
+    else:
+      initial = None
+    form = UserProfileForm(instance=profile, initial=initial)
+    self.render('editProfile.html', self.getContext(locals()))
 
   def post(self):
     user = users.get_current_user()
-    username = user.nickname()
-    logout_url = users.create_logout_url("/")
     profile = getProfile(True)
     form = UserProfileForm(data=self.request.POST, instance=profile)
     if form.is_valid():
-      # Save the data and redirect to home
-      editedProfile = form.save(commit=False)
-      editedProfile.put()
-      defaultPhone = Phone(user=user, number=form._cleaned_data()['phone'])
-      defaultPhone.put()
-      self.redirect('/home')
+      phoneChanged = form.saveWithPhone()
+      if phoneChanged:
+        self.redirect('/phone/verify')
+      else:
+        self.redirect('/home')
     else:
       # Reprint the form
-      self.render('createProfile.html', self.getContext(locals()))
+      self.render('editProfile.html', self.getContext(locals()))
 
 class HomeHandler(RequestHandlerPlus):
   @login_required
@@ -65,15 +76,20 @@ class HomeHandler(RequestHandlerPlus):
     if not profile:
         self.redirect('/newuser/profile')
 
+    # profile widget
+    phonesQuery = Phone.all().filter('user = ', user)
+    phones = phonesQuery.fetch(1)
+
     # emails widget
     emailsQuery = RegisteredEmail.all().filter('userName = ', user)
     emails = emailsQuery.fetch(3)
     numEmailsNotShown = emailsQuery.count() - len(emails)
 
-    # message history widget
+    # recent messages widget
     postsQuery = Post.all().filter('user = ', user).order('-datetime')
-    posts = postsQuery.fetch(3)
-    numPostsNotShown = postsQuery.count() - len(posts)
+    posts = postsQuery.fetch(2)
+    numPosts = postsQuery.count()
+    numPostsNotShown = numPosts - len(posts)
     
     self.render('home.html', self.getContext(locals()))
 
@@ -109,7 +125,7 @@ class AddRegisteredEmailHandler(RequestHandlerPlus):
       else:
         if success:
           newEmail.put()
-    self.redirect('/email')
+    self.redirect(self.request.get('returnAddr'))
 
 class RemoveRegisteredEmailHandler(RequestHandlerPlus):
   def post(self):
@@ -120,62 +136,36 @@ class RemoveRegisteredEmailHandler(RequestHandlerPlus):
       if removeEmailList:
         removeEmailList.delete()
         
-    self.redirect('/email')
+    self.redirect(self.request.get('returnAddr'))
 
 
-class SpamAllRegisteredEmailsHandler(RequestHandlerPlus):
-  def post(self):
-    user = users.get_current_user()
-    if not user:
-      self.redirect("/")
-
-    p = Post(user=user, message='test message')
-    p.put()
-    
-    registeredEmailQuery = RegisteredEmail.all().filter('userName =', users.get_current_user()).order('emailAddress')
-    addresses = []
-    for registeredEmail in registeredEmailQuery:
-      addresses.append(registeredEmail.emailAddress)
-      
-    if (len(addresses) > 0):
-      mail.send_mail(sender=users.get_current_user().email(),
-                     to=users.get_current_user().email(),
-                     bcc=addresses,
-                     subject="I'm OK",
-                     body="""
-Dear Registered User:
-
-This is an auto generated email please do not reply. You are registered to receive emails
-regarding the status of USER. This email lets you know they are OK.
-
-Please let us know if you have any questions.
-
-The ImOK.com Team
-""")
-    self.redirect('/email')
-    
 class DownloadsHandler(RequestHandlerPlus):
   @login_required
   def get(self):
-    self.render('downloads.html', self.getContext(locals()))
+    self.render('download.html', self.getContext(locals()))
     
-class DebugHandler(RequestHandlerPlus):
+class VerifyPhoneHandler(RequestHandlerPlus):
   @login_required
   def get(self):
-    self.render('debug.html', self.getContext(locals()))
+    # FIX implement me
+    self.render('verifyPhone.html', self.getContext(locals()))
+
+  def post(self):
+    # FIX implement me
+    self.redirect('/home')
 
 def main():
   application = webapp.WSGIApplication([
     ('/', IntroHandler),
     ('/home', HomeHandler),
+    ('/about', AboutHandler),
     ('/getInvolved', GetInvolvedHandler),
     ('/email', RegisterEmailHandler),
     ('/email/add', AddRegisteredEmailHandler),
     ('/email/remove', RemoveRegisteredEmailHandler),
-    ('/email/spam', SpamAllRegisteredEmailsHandler),
-    ('/profile/create', CreateProfileHandler),
-    ('/downloads', DownloadsHandler),
-    ('/debug', DebugHandler),
+    ('/phone/verify', VerifyPhoneHandler),
+    ('/profile/edit', EditProfileHandler),
+    ('/download', DownloadsHandler),
                                         
   ], debug=True)
   util.run_wsgi_app(application)

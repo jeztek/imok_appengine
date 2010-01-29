@@ -96,7 +96,7 @@ input[type=submit] {
 
 #nav-global { position:absolute; margin:0; bottom:0; right:0px; white-space:nowrap; font-weight:bold; font-size:14px; }
 #nav-global li { display:block; float:left; list-style-type:none; margin:0; padding:0; }
-#nav-global a { color:#ffffff; display:block; float:left; padding:5em 16px 16px 16px; }
+#nav-global a { text-decoration:none; color:#ffffff; display:block; float:left; padding:5em 16px 16px 16px; }
 #nav-global a:hover { color:white; background:#04351d; }
 
 .errorlist {
@@ -115,3 +115,7 @@ table .messagePost {
 
 #wizardContent{background-color:#f1f2f2; margin-top: 25px; padding: 25px; border-top: 1px solid #ccc; }
 	.nextButton{text-align:right;}
+
+table.profileForm th {
+  font-weight: normal;
+}

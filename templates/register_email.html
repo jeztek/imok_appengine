@@ -1,31 +1,45 @@
 {% extends "base.html" %}
 
 {% block body %}
-<div>
-These are the emails that you have already registered:<br/>
-<table>
-{% for registeredEmail in registeredEmailList %}
-<tr>
-	<td>Email: {{ registeredEmail.emailAddress }}</td>
-	<td><form action="/email/remove?emailAddress={{ registeredEmail.emailAddress|urlencode }}" method="post">
-	<input id="remove-button" type="submit" value="Remove"/>
-	</form></td>
-</tr>
-{% endfor %}
-</table>
+<center>
+<div style="width:500px; text-align:left;">
+
+
+	<style>
+	.removeLink{background-color:transparent; padding: 0px; border-width: 0; font-size: 0.7em; border-color:transparent; cursor: pointer; text-decoration:underline; color:#0000FF; }
+
+	</style>
+	<div id="wizardContent">
+
+		<div>
+			<b>Edit E-Mail Contacts</b><br/>
+			<span style="font-size: 0.8em;">Enter e-mails of people you'd like to notify with <i>I'm OK!</i></span><br/><br/>
+			<form action="/email/add?returnAddr=%2Femail" method="post">
+			<input type="text" value="email address" style="color: #999999;" onclick="if (this.value == 'email address') {this.value = ''; this.style.color = '#000000'; }" name="emailAddress"/>&nbsp;<input type="submit" value="Add"/><br>
+			</form>
+		</div>
+
+		<div>
+                        {% if registeredEmailList %}
+                        <br/>Current e-mail contacts:
+			<table>
+			{% for registeredEmail in registeredEmailList %}
+			<tr>
+				<td style="padding-left: 15px;">{{ registeredEmail.emailAddress }}</td>
+				<td><form action="/email/remove?emailAddress={{ registeredEmail.emailAddress|urlencode }}&returnAddr=%2Femail" method="post">
+				<input style="font-size: 0.9em; border-width: 0px;" class="removeLink" type="submit" value="Remove"/>
+				</form></td>
+			</tr>
+			{% endfor %}
+			</table>
+                        {% endif %}
+		</div>
+		<div class="nextButton">
+			<input type="submit" value="Finish" onclick="document.location = '/home';">
+		</div>
+	</div>
 </div>
 
-<div>
-<br/>If you would like to register an email, enter it here:<br/>
-<form action="/email/add" method="post">
-	Email: <input type="text" name="emailAddress"/><br/>
-	<div><input type="submit" value="Add Email"/></div>
-</form>
-</div>
-
-<br/><br/><br/>**** This is just a placeholder debugging thing for sending out the emails. Replace this with a trigger from SMS. ****
-<form action="/email/spam" method="post">
-	<div><input type="submit" value="Spam!"/></div>
-</form>
-
+</center>
 {% endblock body %}
+
