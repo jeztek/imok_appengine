@@ -16,7 +16,9 @@
 			<span style="font-size: 0.8em;">Enter your name and phone number</span><br/><br/>
 
 			<form method="post" action="/newuser/profile">
-			{{ form.as_p }}
+                        <table>
+			{{ form }}
+                        </table>
 <p>* Number of your phone that you will use to send <i>I'm OK!</i> text messages.
 Must be a 10-digit US phone number.</p>
 			<div class="nextButton">
