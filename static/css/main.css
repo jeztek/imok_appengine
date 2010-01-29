@@ -115,3 +115,7 @@ table .messagePost {
 
 #wizardContent{background-color:#f1f2f2; margin-top: 25px; padding: 25px; border-top: 1px solid #ccc; }
 	.nextButton{text-align:right;}
+
+table.profileForm th {
+  font-weight: normal;
+}

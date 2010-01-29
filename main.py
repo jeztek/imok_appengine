@@ -48,7 +48,7 @@ class EditProfileHandler(RequestHandlerPlus):
     profile = getProfile(True)
     phone = getPhone()
     if phone:
-      initial = dict(phoneNumber=phone.number)
+      initial = dict(phoneNumber=phone.number_str())
     else:
       initial = None
     form = UserProfileForm(instance=profile, initial=initial)
@@ -87,7 +87,7 @@ class HomeHandler(RequestHandlerPlus):
 
     # message history widget
     postsQuery = Post.all().filter('user = ', user).order('-datetime')
-    posts = postsQuery.fetch(3)
+    posts = postsQuery.fetch(10)
     numPostsNotShown = postsQuery.count() - len(posts)
     
     self.render('home.html', self.getContext(locals()))

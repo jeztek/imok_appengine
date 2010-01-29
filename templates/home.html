@@ -68,6 +68,7 @@ table.profileWidget td {
 <div class="widgetBox">
 <div class="homeWidgetTitle">Profile</div>
 
+<p>
 <table class="profileWidget">
 <tr>
   <th>Name:</th>
@@ -76,10 +77,14 @@ table.profileWidget td {
 {% for phone in phones %}
 <tr>
   <th>Phone:</th>
-  <td>{{ phone }}</td>
+  <td>{{ phone.number_str }}</td>
 </tr>
 {% endfor %}
 </table>
+</p>
+<br/>
+<a href="/email">Edit profile</a>
+
 </div>
 
 <div class="widgetBox">
@@ -87,6 +92,8 @@ table.profileWidget td {
 
 <p>When you post an <i>I'm OK!</i> message, these people will
 be notified by e-mail.</p>
+
+<p>
 {% if emails %}
   {% for email in emails %}
     <div style="padding-left: 20px;">{{ email.emailAddress }}{% if not forloop.last %},{% endif %}</div>
@@ -95,9 +102,11 @@ be notified by e-mail.</p>
     <div style="font-style: italic;">... and {{ numEmailsNotShown }} more not shown.</div>
   {% endif %}
 {% else %}
-  <p>[No e-mail contacts set.]</p>
+  [No e-mail contacts set.]
 {% endif %}
-<p><a href="/email">Edit e-mail contacts</a></p>
+</p>
+<br/>
+<a href="/email">Edit e-mail contacts</a>
 </div>
 
 </td>
