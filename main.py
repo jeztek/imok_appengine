@@ -64,10 +64,17 @@ class HomeHandler(RequestHandlerPlus):
     profile = getProfile()
     if not profile:
         self.redirect('/newuser/profile')
+
+    # emails widget
+    emailsQuery = RegisteredEmail.all().filter('userName = ', user)
+    emails = emailsQuery.fetch(3)
+    numEmailsNotShown = emailsQuery.count() - len(emails)
+
+    # message history widget
     postsQuery = Post.all().filter('user = ', user).order('-datetime')
-    posts = postsQuery.fetch(10)
-    isMorePosts = postsQuery.count() > 10
-    logout_url = users.create_logout_url("/")
+    posts = postsQuery.fetch(3)
+    numPostsNotShown = postsQuery.count() - len(posts)
+    
     self.render('home.html', self.getContext(locals()))
 
 class GetInvolvedHandler(RequestHandlerPlus):
@@ -118,18 +125,24 @@ class RemoveRegisteredEmailHandler(RequestHandlerPlus):
 
 class SpamAllRegisteredEmailsHandler(RequestHandlerPlus):
   def post(self):
-    if users.get_current_user():
-      registeredEmailQuery = RegisteredEmail.all().filter('userName =', users.get_current_user()).order('emailAddress')
-      addresses = []
-      for registeredEmail in registeredEmailQuery:
-        addresses.append(registeredEmail.emailAddress)
+    user = users.get_current_user()
+    if not user:
+      self.redirect("/")
+
+    p = Post(user=user, message='test message')
+    p.put()
+    
+    registeredEmailQuery = RegisteredEmail.all().filter('userName =', users.get_current_user()).order('emailAddress')
+    addresses = []
+    for registeredEmail in registeredEmailQuery:
+      addresses.append(registeredEmail.emailAddress)
       
-      if (len(addresses) > 0):
-        mail.send_mail(sender=users.get_current_user().email(),
-                      to=users.get_current_user().email(),
-                      bcc=addresses,
-                      subject="I'm OK",
-                      body="""
+    if (len(addresses) > 0):
+      mail.send_mail(sender=users.get_current_user().email(),
+                     to=users.get_current_user().email(),
+                     bcc=addresses,
+                     subject="I'm OK",
+                     body="""
 Dear Registered User:
 
 This is an auto generated email please do not reply. You are registered to receive emails
@@ -144,10 +157,13 @@ The ImOK.com Team
 class DownloadsHandler(RequestHandlerPlus):
   @login_required
   def get(self):
-    logout_url = users.create_logout_url("/")
-
     self.render('downloads.html', self.getContext(locals()))
     
+class DebugHandler(RequestHandlerPlus):
+  @login_required
+  def get(self):
+    self.render('debug.html', self.getContext(locals()))
+
 def main():
   application = webapp.WSGIApplication([
     ('/', IntroHandler),
@@ -159,6 +175,7 @@ def main():
     ('/email/spam', SpamAllRegisteredEmailsHandler),
     ('/profile/create', CreateProfileHandler),
     ('/downloads', DownloadsHandler),
+    ('/debug', DebugHandler),
                                         
   ], debug=True)
   util.run_wsgi_app(application)
