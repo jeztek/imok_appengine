@@ -3,6 +3,12 @@
 {% block head %}
 <style type="text/css">
 
+.widgetBox {
+  background-color: #eeeeee;
+  padding: 10px;
+  margin-bottom: 20px;
+}
+
 .homeWidgetTitle {
   font-weight: bold;
 }
@@ -14,6 +20,8 @@ table.homeLayout {
 td.homeLayout {
   width: 50%;
   vertical-align: top;
+  padding-left: 10px;
+  padding-right: 10px;
 }
 
 table.messagePost {
@@ -34,6 +42,22 @@ table.messagePost td {
   padding-right: 5px;
 }
 
+table.profileWidget {
+}
+
+table.profileWidget th {
+  text-align: left;
+  padding-left: 5px;
+  padding-right: 5px;
+  font-weight: normal;
+}
+
+table.profileWidget td {
+  text-align: left;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
 </style>
 {% endblock head %}
 
@@ -41,7 +65,8 @@ table.messagePost td {
 
 <table class="homeLayout"><tr><td class="homeLayout">
 
-<p class="homeWidgetTitle">Profile</p>
+<div class="widgetBox">
+<div class="homeWidgetTitle">Profile</div>
 
 <table class="profileWidget">
 <tr>
@@ -55,11 +80,13 @@ table.messagePost td {
 </tr>
 {% endfor %}
 </table>
+</div>
 
-<p class="homeWidgetTitle">E-mail contacts</p>
+<div class="widgetBox">
+<div class="homeWidgetTitle">E-mail contacts</div>
 
-<div>When you post an <i>I'm OK!</i> message, these people will
-be notified by e-mail.</div>
+<p>When you post an <i>I'm OK!</i> message, these people will
+be notified by e-mail.</p>
 {% if emails %}
   {% for email in emails %}
     <div>{{ email.emailAddress }}{% if not forloop.last %},{% endif %}</div>
@@ -68,14 +95,17 @@ be notified by e-mail.</div>
 {% else %}
   <p>[No e-mail contacts set.]</p>
 {% endif %}
-<p><a href="/emails/edit">Edit e-mail contacts</a></p>
+<p><a href="/newuser/profile">Edit e-mail contacts</a></p>
+</div>
 
 </td>
 <td class="homeLayout">
 
-<p class="homeWidgetTitle">Message history</p>
+<div class="widgetBox">
+<div class="homeWidgetTitle">Message history</div>
 
 {% if posts %}
+<p>
 <table border="1" class="messagePost">
   <tr>
     <th>Time</th>
@@ -86,6 +116,7 @@ be notified by e-mail.</div>
   {{ post.asTableRow }}
 {% endfor %}
 </table>
+</p>
 
 <p><a href="/posts/detail">
 View more details
@@ -95,9 +126,10 @@ and {{ numPostsNotShown }} older messages</a></p>
 </a></p>
 
 {% else %}
-[You haven't posted any messages yet]
+<p>[You haven't posted any messages yet]</p>
 {% endif %}
 
 </td></tr></table>
+</div>
 
 {% endblock body %}
