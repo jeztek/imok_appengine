@@ -113,7 +113,7 @@ class AddRegisteredEmailHandler(RequestHandlerPlus):
       else:
         if success:
           newEmail.put()
-    self.redirect('/email')
+    self.redirect(self.request.get('returnAddr'))
 
 class RemoveRegisteredEmailHandler(RequestHandlerPlus):
   def post(self):
@@ -124,7 +124,7 @@ class RemoveRegisteredEmailHandler(RequestHandlerPlus):
       if removeEmailList:
         removeEmailList.delete()
         
-    self.redirect('/email')
+    self.redirect(self.request.get('returnAddr'))
 
 
 class SpamAllRegisteredEmailsHandler(RequestHandlerPlus):
@@ -156,7 +156,7 @@ Please let us know if you have any questions.
 
 The ImOK.com Team
 """)
-    self.redirect('/email')
+    self.redirect('/newuser/contacts')
     
 class DownloadsHandler(RequestHandlerPlus):
   @login_required

@@ -14,7 +14,7 @@
 		<div>
 			<b>Add Contacts</b><br/>
 			<span style="font-size: 0.8em;">Enter emails of people who you'd like to notify with I'm OK!</span><br/><br/>
-			<form action="/email/add" method="post">
+			<form action="/email/add?returnAddr=%2Fnewuser%2Fcontacts" method="post">
 			<input type="text" value="email address" onclick="if (this.value == 'email address') {this.value = '';}" name="emailAddress"/>&nbsp;<input type="submit" value="Add"/><br>
 			</form>
 		</div>
@@ -24,7 +24,7 @@
 			{% for registeredEmail in registeredEmailList %}
 			<tr>
 				<td>{{ registeredEmail.emailAddress }}</td>
-				<td><form action="/email/remove?emailAddress={{ registeredEmail.emailAddress|urlencode }}" method="post">
+				<td><form action="/email/remove?emailAddress={{ registeredEmail.emailAddress|urlencode }}&returnAddr=%2Fnewuser%2Fcontacts" method="post">
 				<input style="font-size: 0.9em; border-width: 0px;" class="removeLink" type="submit" value="Remove"/>
 				</form></td>
 			</tr>

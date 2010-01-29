@@ -45,6 +45,7 @@ class NewUserProfileHandler(RequestHandlerPlus):
       self.redirect('/newuser/verifyPhone')
     else:
       # Reprint the form
+      turnOnSelection1 = "selectedNavItem"
       self.render('newUserProfile.html', self.getContext(locals()))
 
 class NewUserVerifyPhoneHandler(RequestHandlerPlus):
