@@ -91,7 +91,9 @@ be notified by e-mail.</p>
   {% for email in emails %}
     <div>{{ email.emailAddress }}{% if not forloop.last %},{% endif %}</div>
   {% endfor %}
-  <div>... and {{ numEmailsNotShown }} more not shown.</div>
+  {% if numEmailsNotShown %}
+    <div style="font-style: italic;">... and {{ numEmailsNotShown }} more not shown.</div>
+  {% endif %}
 {% else %}
   <p>[No e-mail contacts set.]</p>
 {% endif %}
