@@ -15,6 +15,7 @@ except ImportError:
 import django.core.exceptions
 
 from datastore import *
+from imokutils import *
 
 class PhoneField(forms.CharField):
   def __init__(self, *args, **kwargs):
@@ -31,7 +32,20 @@ class PhoneField(forms.CharField):
       raise forms.ValidationError('Please enter a valid 10-digit US phone number')
 
 class UserProfileForm(djangoforms.ModelForm):
-  phone = PhoneField(label="Phone number*")
+  phoneNumber = PhoneField(label="Phone number*")
+
+  def saveWithPhone(self):
+    editedProfile = self.save(commit=False)
+    editedProfile.put()
+
+    phone = getPhone(createIfNeeded=True)
+    newNumber = self._cleaned_data()['phoneNumber']
+    if newNumber != phone.number:
+      phone.number = newNumber
+      phone.code = ''
+      phone.verified = False
+      phone.put()
+  
   class Meta:
     model = ImokUser
     exclude = ['account']
