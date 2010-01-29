@@ -19,6 +19,7 @@
 		</div>
 
 		<div>
+                        {% if registeredEmailList %}
                         <br/>Current e-mail contacts:
 			<table>
 			{% for registeredEmail in registeredEmailList %}
@@ -30,6 +31,7 @@
 			</tr>
 			{% endfor %}
 			</table>
+                        {% endif %}
 		</div>
 		<div class="nextButton">
 			<input type="submit" value="Finish" onclick="document.location = '/home';">
