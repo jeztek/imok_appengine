@@ -85,10 +85,11 @@ class HomeHandler(RequestHandlerPlus):
     emails = emailsQuery.fetch(3)
     numEmailsNotShown = emailsQuery.count() - len(emails)
 
-    # message history widget
+    # recent messages widget
     postsQuery = Post.all().filter('user = ', user).order('-datetime')
-    posts = postsQuery.fetch(10)
-    numPostsNotShown = postsQuery.count() - len(posts)
+    posts = postsQuery.fetch(2)
+    numPosts = postsQuery.count()
+    numPostsNotShown = numPosts - len(posts)
     
     self.render('home.html', self.getContext(locals()))
 
@@ -138,37 +139,6 @@ class RemoveRegisteredEmailHandler(RequestHandlerPlus):
     self.redirect(self.request.get('returnAddr'))
 
 
-class SpamAllRegisteredEmailsHandler(RequestHandlerPlus):
-  def post(self):
-    user = users.get_current_user()
-    if not user:
-      self.redirect("/")
-
-    p = Post(user=user, message='test message')
-    p.put()
-    
-    registeredEmailQuery = RegisteredEmail.all().filter('userName =', users.get_current_user()).order('emailAddress')
-    addresses = []
-    for registeredEmail in registeredEmailQuery:
-      addresses.append(registeredEmail.emailAddress)
-      
-    if (len(addresses) > 0):
-      mail.send_mail(sender=users.get_current_user().email(),
-                     to=users.get_current_user().email(),
-                     bcc=addresses,
-                     subject="I'm OK",
-                     body="""
-Dear Registered User:
-
-This is an auto generated email please do not reply. You are registered to receive emails
-regarding the status of USER. This email lets you know they are OK.
-
-Please let us know if you have any questions.
-
-The ImOK.com Team
-""")
-    self.redirect('/newuser/contacts')
-    
 class DownloadsHandler(RequestHandlerPlus):
   @login_required
   def get(self):
@@ -193,7 +163,6 @@ def main():
     ('/email', RegisterEmailHandler),
     ('/email/add', AddRegisteredEmailHandler),
     ('/email/remove', RemoveRegisteredEmailHandler),
-    ('/email/spam', SpamAllRegisteredEmailsHandler),
     ('/phone/verify', VerifyPhoneHandler),
     ('/profile/edit', EditProfileHandler),
     ('/download', DownloadsHandler),

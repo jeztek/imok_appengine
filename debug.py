@@ -41,10 +41,42 @@ class ResetDbHandler(RequestHandlerPlus):
       self.error(403)
       self.response.out.write('403 Forbidden')
 
+class DebugPostHandler(RequestHandlerPlus):
+  def post(self):
+    user = users.get_current_user()
+    if not user:
+      self.redirect("/")
+
+    p = Post(user=user, message='test message', lat=37., lon=-122.)
+    p.put()
+    
+    registeredEmailQuery = RegisteredEmail.all().filter('userName =', users.get_current_user()).order('emailAddress')
+    addresses = []
+    for registeredEmail in registeredEmailQuery:
+      addresses.append(registeredEmail.emailAddress)
+      
+    if (len(addresses) > 0):
+      mail.send_mail(sender=users.get_current_user().email(),
+                     to=users.get_current_user().email(),
+                     bcc=addresses,
+                     subject="I'm OK",
+                     body="""
+Dear Registered User:
+
+This is an auto generated email please do not reply. You are registered to receive emails
+regarding the status of USER. This email lets you know they are OK.
+
+Please let us know if you have any questions.
+
+The ImOK.com Team
+""")
+    self.redirect('/home')
+    
 def main():
   application = webapp.WSGIApplication([
     ('/debug', DebugHandler),
     ('/debug/resetdb', ResetDbHandler),
+    ('/debug/post', DebugPostHandler),
                                         
   ], debug=True)
   util.run_wsgi_app(application)

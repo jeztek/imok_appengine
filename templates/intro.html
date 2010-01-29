@@ -1,5 +1,49 @@
 {% extends "base.html" %}
 
+{% block head %}
+<style>
+
+body { font-family:arial; }
+#superTitle {
+  font-size: 24px;
+  font-weight: bold;
+}
+#content {
+  font-size: 16px;
+  font-weight: normal;
+  padding-top:10px;
+}
+#signup {
+  background-image: url(signup.png);
+  width: 280px;
+  height: 302px;
+  color: #fff;
+  padding-top: 80px;
+  padding-left: 20px;
+}
+.signupItem {
+  padding:10px;
+  font-weight:bold;
+  font-size: 12px;
+}
+.signupItem input {
+  font-size:16px;
+  width: 240px;
+  padding:5px;
+}
+#signupSubmit {
+  text-align: right;
+  padding-right: 30px;
+  padding-top: 20px;
+}
+#signupSubmit input {
+  font-size:16px;
+  padding:5px;
+}
+</style>
+
+{% endblock %}
+
 {% block body %}
 
 <table>
