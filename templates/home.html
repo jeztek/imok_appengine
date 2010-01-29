@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block head %}
+<style type="text/css">
+
+.homeWidgetTitle {
+  font-weight: bold;
+}
+
+table.homeLayout {
+  width: 100%;
+}
+
+td.homeLayout {
+  width: 50%;
+  vertical-align: top;
+}
+
+table.messagePost {
+  border-width: 1px;
+}
+
+th.messagePost {
+  font-weight: normal;
+  font-style: italic;
+  text-align: left;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+td.messagePost {
+  text-align: left;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+</style>
+{% endblock %}
+
+{% block body %}
+
+<table class="homeLayout"><tr><td class="homeLayout">
+
+<p class="homeWidgetTitle">E-mail contacts</p>
+
+<div>When you post an <i>I'm OK!</i> message, these people will
+be notified by e-mail.</div>
+{% if emails %}
+  {% for email in emails %}
+    <div>{{ email }}{% if not forloop.last %},{% endif %}</div>
+  {% endfor %}
+  <div>... and {{ numEmailsNotShown }} more not shown.</div>
+{% else %}
+  <p>[No e-mail contacts set.]</p>
+{% endif %}
+<p><a href="/emails/edit">Edit e-mail contacts</a></p>
+
+</td>
+<td class="homeLayout">
+
+<p class="homeWidgetTitle">Message history</p>
+
+{% if posts %}
+<table border="1" class="messagePost">
+  <tr>
+    <th class="messagePost">Time</th>
+    <th class="messagePost">Position</th>
+    <th class="messagePost">Message</th>
+  </tr>
+{% for post in posts %}
+  {{ post.asTableRow }}
+{% endfor %}
+</table>
+
+<p><a href="/posts/detail">
+View more details
+{% if numPostsNotShown %}
+and {{ numPostsNotShown }} older messages</a></p>
+{% endif %}
+</a></p>
+
+{% else %}
+[You haven't posted any messages yet]
+{% endif %}
+
+</td></tr></table>
+
+{% endblock body %}

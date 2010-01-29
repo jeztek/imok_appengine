@@ -1,5 +1,10 @@
 
 from google.appengine.ext import db
+try:
+  from django.utils.safestring import mark_safe
+except ImportError:
+  def mark_safe(s):
+    return s
 
 import re, random
 
@@ -51,9 +56,29 @@ class Post(db.Model):
   datetime = db.DateTimeProperty(auto_now_add=True)
 
   # this could maybe be a GeoPtProperty() - i don't know if it matters.
-  lat      = db.FloatProperty()
-  lon	   = db.FloatProperty()
+  lat      = db.FloatProperty(default=0.0)
+  lon	   = db.FloatProperty(default=0.0)
+  positionText = db.StringProperty(default='')
   message  = db.StringProperty()
+
+  def asTableRow(self):
+    timeStr = self.datetime.strftime('%b %d %H:%M')
+    posList = []
+    if self.positionText:
+      posList.append(self.positionText)
+    if not self.lat == 0 and self.lon == 0:
+      posList.append('Lat/lon: %f, %f' % (self.lat, self.lon))
+    if posList:
+      posStr = '<br/>'.join(posList)
+    else:
+      posStr = '(none)'
+    return mark_safe("""
+<tr>
+  <td class="messagePost">%s</td>
+  <td class="messagePost">%s</td>
+  <td class="messagePost">%s</td>
+</tr>
+""" % (timeStr, posStr, self.message))
 
 class SmsMessage(db.Model):
   sha_hash     = db.StringProperty(required=True)

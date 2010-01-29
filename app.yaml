@@ -31,5 +31,8 @@ handlers:
   script: tasks.py
   login: admin
 
+- url: /newuser/.*
+  script: newuser.py
+
 - url: .*
   script: main.py

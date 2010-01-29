@@ -14,68 +14,37 @@ except ImportError:
   from django import forms
 import django.core.exceptions
 
-import settings as s
+import settings
 from datastore import *
+from imokutils import *
+from imokforms import *
 
-class IntroHandler(webapp.RequestHandler):
+class IntroHandler(RequestHandlerPlus):
   def get(self):
-    template_path = s.template_path('intro.html')
-    self.response.headers['Content-Type'] = 'text/html'
-    self.response.out.write(template.render(template_path, locals()))
-
-class PhoneField(forms.CharField):
-  def __init__(self, *args, **kwargs):
-    kwargs['max_length'] = 12
-    super(PhoneField, self).__init__(*args, **kwargs)
-
-  def clean(self, value):
-    cleanNumber = re.sub(r'\D+', '', value) # ignore punctuation
-    if len(cleanNumber) == 10:
-      return "+1%s" % cleanNumber
-    elif len(cleanNumber) == 11 and cleanNumber.startswith('1'):
-      return "+%s" % cleanNumber
+    if users.get_current_user():
+        logout_url = users.create_logout_url("/")
     else:
-      raise forms.ValidationError('Please enter a valid 10-digit US phone number')
+        mustLogIn = "True" # this is so the navigation bar only shows the relevant things.
+        login_url = users.create_login_url("/home")
+        #loginOutUrl = users.create_login_url(self.request.uri)
 
-class UserProfileForm(djangoforms.ModelForm):
-  phone = PhoneField()
-  class Meta:
-    model = ImokUser
-    exclude = ['account']
-
-class RequestHandlerPlus(webapp.RequestHandler):
-  def render(self, tmplName, tmplValues, contentType='text/html'):
-    self.response.headers['Content-Type'] = contentType
-    self.response.out.write(template.render(s.template_path(tmplName), tmplValues))
+    self.render('intro.html', self.getContext(locals()))
 
 class CreateProfileHandler(RequestHandlerPlus):
-  def getProfile(self):
-    # Annoying that we can't use django get_or_create() idiom here.  the
-    # appengine equivalent get_or_insert() seems to allow querying by
-    # key only.  I also ran into problems trying to wrap this in a
-    # transaction.
-    user = users.get_current_user()
-    profiles = ImokUser.all().filter('account =', user).fetch(1)
-    if profiles:
-      profile = profiles[0]
-    else:
-      profile = ImokUser(account=user)
-    return profile
-
   @login_required
   def get(self):
     user = users.get_current_user()
     username = user.nickname()
     logout_url = users.create_logout_url("/")
-    profile = self.getProfile()
+    profile = getProfile(True)
     form = UserProfileForm(instance=profile)
-    self.render('createProfile.html', locals())
+    self.render('createProfile.html', self.getContext(locals()))
 
   def post(self):
     user = users.get_current_user()
     username = user.nickname()
     logout_url = users.create_logout_url("/")
-    profile = self.getProfile()
+    profile = getProfile(True)
     form = UserProfileForm(data=self.request.POST, instance=profile)
     if form.is_valid():
       # Save the data and redirect to home
@@ -86,45 +55,43 @@ class CreateProfileHandler(RequestHandlerPlus):
       self.redirect('/home')
     else:
       # Reprint the form
-      self.render('createProfile.html', locals())
+      self.render('createProfile.html', self.getContext(locals()))
 
-class HomeHandler(webapp.RequestHandler):
+class HomeHandler(RequestHandlerPlus):
   @login_required
   def get(self):
+    user = users.get_current_user()
+    profile = getProfile()
+    if not profile:
+        self.redirect('/newuser/profile')
 
-#    user = users.get_current_user()
-#    username = user.nickname()
-    if users.get_current_user():
-        url = users.create_logout_url("/")
-        url_linktext = 'Logout'
-    else:
-        url = users.create_login_url(self.request.uri)
-        url_linktext = 'Login'
-        mustLogIn = "True"; # this is so the navigation bar only shows the relevant things.
+    # emails widget
+    emailsQuery = RegisteredEmail.all().filter('userName = ', user)
+    emails = emailsQuery.fetch(3)
+    numEmailsNotShown = emailsQuery.count() - len(emails)
 
-    template_path = s.template_path('main.html')
-    self.response.headers['Content-Type'] = 'text/html'
-    self.response.out.write(template.render(template_path, locals()))
+    # message history widget
+    postsQuery = Post.all().filter('user = ', user).order('-datetime')
+    posts = postsQuery.fetch(3)
+    numPostsNotShown = postsQuery.count() - len(posts)
+    
+    self.render('home.html', self.getContext(locals()))
 
 class GetInvolvedHandler(RequestHandlerPlus):
   def get(self):
-    self.render('getInvolved.html', locals())
+    self.render('getInvolved.html', self.getContext(locals()))
 
-class RegisterEmailHandler(webapp.RequestHandler):
+class RegisterEmailHandler(RequestHandlerPlus):
   @login_required
   def get(self):
     registeredEmailQuery = RegisteredEmail.all().filter('userName =', users.get_current_user()).order('emailAddress')
     registeredEmailList = registeredEmailQuery.fetch(100)
     
-    url = users.create_logout_url("/")
-    url_linktext = 'Logout'
+    logout_url = users.create_logout_url("/")
 
-    template_path = s.template_path('register_email.html')
-    self.response.headers['Content-Type'] = 'text/html'
-    self.response.out.write(template.render(template_path, locals()))
+    self.render('register_email.html', self.getContext(locals()))
 
-
-class AddRegisteredEmailHandler(webapp.RequestHandler):
+class AddRegisteredEmailHandler(RequestHandlerPlus):
   def post(self):
     if users.get_current_user():
       newEmail = RegisteredEmail()
@@ -144,8 +111,7 @@ class AddRegisteredEmailHandler(webapp.RequestHandler):
           newEmail.put()
     self.redirect('/email')
 
-
-class RemoveRegisteredEmailHandler(webapp.RequestHandler):
+class RemoveRegisteredEmailHandler(RequestHandlerPlus):
   def post(self):
     if users.get_current_user():
       removeEmail = self.request.get('emailAddress')
@@ -157,20 +123,26 @@ class RemoveRegisteredEmailHandler(webapp.RequestHandler):
     self.redirect('/email')
 
 
-class SpamAllRegisteredEmailsHandler(webapp.RequestHandler):
+class SpamAllRegisteredEmailsHandler(RequestHandlerPlus):
   def post(self):
-    if users.get_current_user():
-      registeredEmailQuery = RegisteredEmail.all().filter('userName =', users.get_current_user()).order('emailAddress')
-      addresses = []
-      for registeredEmail in registeredEmailQuery:
-        addresses.append(registeredEmail.emailAddress)
+    user = users.get_current_user()
+    if not user:
+      self.redirect("/")
+
+    p = Post(user=user, message='test message')
+    p.put()
+    
+    registeredEmailQuery = RegisteredEmail.all().filter('userName =', users.get_current_user()).order('emailAddress')
+    addresses = []
+    for registeredEmail in registeredEmailQuery:
+      addresses.append(registeredEmail.emailAddress)
       
-      if (len(addresses) > 0):
-        mail.send_mail(sender=users.get_current_user().email(),
-                      to=users.get_current_user().email(),
-                      bcc=addresses,
-                      subject="I'm OK",
-                      body="""
+    if (len(addresses) > 0):
+      mail.send_mail(sender=users.get_current_user().email(),
+                     to=users.get_current_user().email(),
+                     bcc=addresses,
+                     subject="I'm OK",
+                     body="""
 Dear Registered User:
 
 This is an auto generated email please do not reply. You are registered to receive emails
@@ -182,7 +154,16 @@ The ImOK.com Team
 """)
     self.redirect('/email')
     
+class DownloadsHandler(RequestHandlerPlus):
+  @login_required
+  def get(self):
+    self.render('downloads.html', self.getContext(locals()))
     
+class DebugHandler(RequestHandlerPlus):
+  @login_required
+  def get(self):
+    self.render('debug.html', self.getContext(locals()))
+
 def main():
   application = webapp.WSGIApplication([
     ('/', IntroHandler),
@@ -193,6 +174,9 @@ def main():
     ('/email/remove', RemoveRegisteredEmailHandler),
     ('/email/spam', SpamAllRegisteredEmailsHandler),
     ('/profile/create', CreateProfileHandler),
+    ('/downloads', DownloadsHandler),
+    ('/debug', DebugHandler),
+                                        
   ], debug=True)
   util.run_wsgi_app(application)
 

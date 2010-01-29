@@ -2,11 +2,13 @@
 
 {% block body %}
 
-<p>Welcome, {{ username }}.  To begin using <i>I'm OK</i>,
-we'll need some more information about you.</p>
+<p>Welcome, {{ user.nickname }}.  To begin using <i>I'm OK</i>,
+we'll need some more information about you. (All fields are required.)</p>
 
 <form method="post" action="/profile/create">
 {{ form.as_p }}
 <input type="submit" value="Submit">
+<p>* Number of your phone that you will use to send <i>I'm OK!</i> text messages.
+Must be a 10-digit US phone number.</p>
 </form>
 {% endblock body %}
