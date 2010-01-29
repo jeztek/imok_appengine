@@ -24,15 +24,15 @@ handlers:
 - url: /incoming/.*
   script: incoming.py
 
-- url: /phone/.*
-  script: phone.py
-
 - url: /tasks/.*
   script: tasks.py
   login: admin
 
 - url: /newuser/.*
   script: newuser.py
+
+- url: /debug.*
+  script: debug.py
 
 - url: .*
   script: main.py

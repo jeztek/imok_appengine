@@ -52,32 +52,32 @@ class MessageHandler(RequestHandlerPlus):
 
     self.render('message.html', self.getContext(locals()))
 
-class CreateProfileHandler(RequestHandlerPlus):
+class EditProfileHandler(RequestHandlerPlus):
   @login_required
   def get(self):
     user = users.get_current_user()
-    username = user.nickname()
-    logout_url = users.create_logout_url("/")
     profile = getProfile(True)
-    form = UserProfileForm(instance=profile)
-    self.render('createProfile.html', self.getContext(locals()))
+    phone = getPhone()
+    if phone:
+      initial = dict(phoneNumber=phone.number)
+    else:
+      initial = None
+    form = UserProfileForm(instance=profile, initial=initial)
+    self.render('editProfile.html', self.getContext(locals()))
 
   def post(self):
     user = users.get_current_user()
-    username = user.nickname()
-    logout_url = users.create_logout_url("/")
     profile = getProfile(True)
     form = UserProfileForm(data=self.request.POST, instance=profile)
     if form.is_valid():
-      # Save the data and redirect to home
-      editedProfile = form.save(commit=False)
-      editedProfile.put()
-      defaultPhone = Phone(user=user, number=form._cleaned_data()['phone'])
-      defaultPhone.put()
-      self.redirect('/home')
+      phoneChanged = form.saveWithPhone()
+      if phoneChanged:
+        self.redirect('/phone/verify')
+      else:
+        self.redirect('/home')
     else:
       # Reprint the form
-      self.render('createProfile.html', self.getContext(locals()))
+      self.render('editProfile.html', self.getContext(locals()))
 
 class HomeHandler(RequestHandlerPlus):
   @login_required
@@ -191,27 +191,15 @@ class DownloadsHandler(RequestHandlerPlus):
   def get(self):
     self.render('download.html', self.getContext(locals()))
     
-class DebugHandler(RequestHandlerPlus):
+class VerifyPhoneHandler(RequestHandlerPlus):
   @login_required
   def get(self):
-    self.render('debug.html', self.getContext(locals()))
+    # FIX implement me
+    self.render('verifyPhone.html', self.getContext(locals()))
 
-def deleteAll(query):
-  count = query.count()
-  results = query.fetch(count)
-  db.delete(results)
-
-class ResetDbHandler(RequestHandlerPlus):
   def post(self):
-    if users.is_current_user_admin():
-      deleteAll(ImokUser.all())
-      deleteAll(Phone.all())
-      deleteAll(RegisteredEmail.all())
-      deleteAll(Post.all())
-      self.render('resetdb.html', self.getContext(locals()))
-    else:
-      self.error(403)
-      self.response.out.write('403 Forbidden')
+    # FIX implement me
+    self.redirect('/home')
 
 def main():
   application = webapp.WSGIApplication([
@@ -226,10 +214,9 @@ def main():
     ('/email/add', AddRegisteredEmailHandler),
     ('/email/remove', RemoveRegisteredEmailHandler),
     ('/email/spam', SpamAllRegisteredEmailsHandler),
-    ('/profile/create', CreateProfileHandler),
+    ('/phone/verify', VerifyPhoneHandler),
+    ('/profile/edit', EditProfileHandler),
     ('/download', DownloadsHandler),
-    ('/debug', DebugHandler),
-    ('/debug/resetdb', ResetDbHandler),
                                         
   ], debug=True)
   util.run_wsgi_app(application)

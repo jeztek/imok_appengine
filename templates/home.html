@@ -89,7 +89,7 @@ table.profileWidget td {
 be notified by e-mail.</p>
 {% if emails %}
   {% for email in emails %}
-    <div>{{ email.emailAddress }}{% if not forloop.last %},{% endif %}</div>
+    <div style="padding-left: 20px;">{{ email.emailAddress }}{% if not forloop.last %},{% endif %}</div>
   {% endfor %}
   {% if numEmailsNotShown %}
     <div style="font-style: italic;">... and {{ numEmailsNotShown }} more not shown.</div>
