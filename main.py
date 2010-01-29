@@ -37,9 +37,20 @@ class AboutHandler(RequestHandlerPlus):
     else:
         mustLogIn = "True" # this is so the navigation bar only shows the relevant things.
         login_url = users.create_login_url("/home")
-        #loginOutUrl = users.create_login_url(self.request.uri)
 
     self.render('about.html', self.getContext(locals()))
+
+class MessageHandler(RequestHandlerPlus):
+  def get(self):
+    if users.get_current_user():
+        logout_url = users.create_logout_url("/")
+    else:
+        mustLogIn = "True" # this is so the navigation bar only shows the relevant things.
+        login_url = users.create_login_url("/home")
+
+    uniqueID = self.request.get('uniqueID')
+
+    self.render('message.html', self.getContext(locals()))
 
 class CreateProfileHandler(RequestHandlerPlus):
   @login_required
@@ -94,6 +105,12 @@ class HomeHandler(RequestHandlerPlus):
 
 class GetInvolvedHandler(RequestHandlerPlus):
   def get(self):
+    if users.get_current_user():
+        logout_url = users.create_logout_url("/")
+    else:
+        mustLogIn = "True" # this is so the navigation bar only shows the relevant things.
+        login_url = users.create_login_url("/home")
+
     self.render('getInvolved.html', self.getContext(locals()))
 
 class RegisterEmailHandler(RequestHandlerPlus):
@@ -201,7 +218,10 @@ def main():
     ('/', IntroHandler),
     ('/home', HomeHandler),
     ('/about', AboutHandler),
+    ('/message', MessageHandler),
     ('/getInvolved', GetInvolvedHandler),
+
+    # must be logged in for these...
     ('/email', RegisterEmailHandler),
     ('/email/add', AddRegisteredEmailHandler),
     ('/email/remove', RemoveRegisteredEmailHandler),

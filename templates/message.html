@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block body %}
+<center>
+<div style="width:640px; text-align:left;">
+	<div id="wizardContent">
+
+		<div>
+			<b>This is the awesome message:</b><br/>
+			Help me! I'm so hurt. The sky is falling. Ouch. Charlie bit me and it still hurts.<br/>
+
+
+
+
+
+
+
+
+    <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAAFc3F2oO92IOeSdh20OvwRTIaxK6J1v0NBsI6tB269QU6Hg_LRSrbrOnRs7NAA_zH6sTW8fJ-5NpgQ&sensor=false"
+            type="text/javascript"></script>
+    <script type="text/javascript">
+/*
+	function createMarker(point, number) {
+	  var marker = new GMarker(point);
+	  var message = ["This","is","the","secret","message"];
+	  marker.value = number;
+	  GEvent.addListener(marker, "click", function() {
+		var myHtml = "<b>#" + number + "</b><br/>" + message[number -1];
+		map.openInfoWindowHtml(point, myHtml);
+	  });
+	  return marker;
+	}
+*/
+    function initialize() {
+      if (GBrowserIsCompatible()) {
+        var map = new GMap2(document.getElementById("map_canvas"));
+        var point = new GLatLng(37.77493,-122.419416);
+        map.setCenter(point, 12);
+        map.setUIToDefault();
+
+		// Create our "tiny" marker icon
+//		var blueIcon = new GIcon(G_DEFAULT_ICON);
+//		blueIcon.image = "http://www.google.com/intl/en_us/mapfiles/ms/micons/blue-dot.png";
+//		// Set up our GMarkerOptions object
+//		markerOptions = { icon:blueIcon };
+//	    map.addOverlay(new GMarker(point, markerOptions));
+
+
+	    map.addOverlay(new GMarker(point));
+
+		map.setCenter(point, 13);
+		//map.openInfoWindow(map.getCenter(), document.createTextNode("Name: John Doe\n</br>Phone: 650-555-1212</br>"));
+		map.openInfoWindowHtml(map.getCenter(), "Name: John Doe</br>Phone: 650-555-1212</br>Needs: Evac, Electricity</br>Message: Nobody was hurt");
+
+		var bounds = map.getBounds();
+		var southWest = bounds.getSouthWest();
+		var northEast = bounds.getNorthEast();
+		var lngSpan = northEast.lng() - southWest.lng();
+		var latSpan = northEast.lat() - southWest.lat();
+		for (var i = 0; i < 15; i++) {
+		  var point = new GLatLng(southWest.lat() + latSpan * Math.random(), southWest.lng() + lngSpan * Math.random());
+
+		var number = i + 1;
+		  var marker = new GMarker(point);
+		  var message = ["This","is","the","secret","message"];
+		  marker.value = number;
+		  GEvent.addListener(marker, "click", function() {
+			var myHtml = "<b>#" + number + "</b><br/>" + message[number -1];
+			map.openInfoWindowHtml(point, myHtml);
+		  });
+
+		  map.addOverlay(marker);// createMarker(point, i + 1));
+		}
+
+        }
+    }
+
+    </script>
+
+
+
+  <body onload="initialize()" onunload="GUnload()">
+    <div id="map_canvas" style="width: 600px; height: 480px"></div>
+  </body>
+
+
+
+
+
+
+
+		</div>
+
+	</div>
+
+</div>
+</center>
+{% endblock body %}
