@@ -1,15 +1,30 @@
 {% extends "base.html" %}
 
 {% block body %}
+<center>
+<div style="width:500px; text-align:left;">
+	{% include "newUserNav.html" %}
 
-{% include "newUserNav.html" %}
+	<style>
+	.removeLink{background-color:transparent; padding: 0px; border-width: 0; font-size: 0.7em; border-color:transparent; cursor: pointer; text-decoration:underline; color:#0000FF; }
 
-<p><b>Step 1: Enter your name and phone number</b></p>
+	</style>
+	<div id="wizardContent">
 
-<form method="post" action="/newuser/profile">
-{{ form.as_p }}
-<input type="submit" value="Submit">
-<p>* Number of your phone that you will use to send <i>I'm OK!</i> text messages.
-Must be a 10-digit US phone number.</p>
-</form>
+		<div>
+			<b>Profile Information</b><br/>
+			<span style="font-size: 0.8em;">Enter your name and phone number</span><br/><br/>
+
+			<form method="post" action="/newuser/profile">
+			{{ form.as_p }}
+			<div class="nextButton">
+				<input  type="submit" value="Next">
+			</div>
+			</form>
+		</div>
+
+	</div>
+
+</div>
+</center>
 {% endblock body %}

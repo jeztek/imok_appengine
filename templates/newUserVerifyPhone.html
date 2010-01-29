@@ -1,15 +1,27 @@
 {% extends "base.html" %}
 
 {% block body %}
+<center>
+<div style="width:500px; text-align:left;">
+	{% include "newUserNav.html" %}
 
-{% include "newUserNav.html" %}
+	<style>
+	.removeLink{background-color:transparent; padding: 0px; border-width: 0; font-size: 0.7em; border-color:transparent; cursor: pointer; text-decoration:underline; color:#0000FF; }
 
-<p><b>Step 2: Verify your phone number</b></p>
+	</style>
+	<div id="wizardContent">
 
-<form action="/newuser/verifyPhone" method="post">
-<p>Add actual form here.  For now, the submit button just redirects
-to the next step of the newuser wizard.</p>
-<input type="submit" value="Submit">
-</form>
+		<div>
+			<b>Verify Phone</b><br/>
+			<span style="font-size: 0.8em;">PLACEHOLDER: Verify your phone number</span><br/><br/>
 
+		<div class="nextButton">
+			<input type="submit" value="Next" onclick="document.location = '/newuser/contacts';">
+		</div>
+		</div>
+
+	</div>
+
+</div>
+</center>
 {% endblock body %}

@@ -27,6 +27,7 @@ class NewUserProfileHandler(RequestHandlerPlus):
     logout_url = users.create_logout_url("/")
     profile = getProfile(True)
     form = UserProfileForm(instance=profile)
+    turnOnSelection1 = "selectedNavItem"
     self.render('newUserProfile.html', self.getContext(locals()))
 
   def post(self):
@@ -47,14 +48,21 @@ class NewUserProfileHandler(RequestHandlerPlus):
       self.render('newUserProfile.html', self.getContext(locals()))
 
 class NewUserVerifyPhoneHandler(RequestHandlerPlus):
+  @login_required
   def get(self):
+    turnOnSelection2 = "selectedNavItem"
     self.render('newUserVerifyPhone.html', self.getContext(locals()))
 
   def post(self):
     self.redirect('/newuser/contacts')
 
 class NewUserContactsHandler(RequestHandlerPlus):
+  @login_required
   def get(self):
+    registeredEmailQuery = RegisteredEmail.all().filter('userName =', users.get_current_user()).order('emailAddress')
+    registeredEmailList = registeredEmailQuery.fetch(100)
+
+    turnOnSelection3 = "selectedNavItem"
     self.render('newUserContacts.html', self.getContext(locals()))
 
 def main():

@@ -1,6 +1,31 @@
-Welcome, {{ user.nickname }}.  To complete your signup, we'll take you through the following steps:
+<style>
+	#wizardNav{margin-top:25px; background-color:#f1f2f2; width:500px; height:64px;}
+		.wizardNavItem { padding:10px; float:left; border-right:2px solid #FFFFFF; }
+			.tinyInfo { font-size:0.9em; }
+		.selectedNavItem {background-color: #000000; color: #FFFFFF;}
+</style>
+<div id = "wizardNav">
+	<div id = "wizardNav1" class = "{{ turnOnSelection1 }} wizardNavItem">
+		<b>Step 1</b><br/>
+		<span class = "tinyInfo">Profile Information</span>
+	</div>
+	<div id = "wizardNav2" class = "{{ turnOnSelection2 }} wizardNavItem">
+		<b>Step 2</b><br/>
+		<span class = "tinyInfo">Verify Phone</span>
+	</div>
+	<div id = "wizardNav3" class = "{{ turnOnSelection3 }} wizardNavItem">
+		<b>Step 3</b><br/>
+		<span class = "tinyInfo">Add Contacts</span>
+	</div>
+</div>
+
+
+
+
+
+<!--Welcome, {{ user.nickname }}.  To complete your signup, we'll take you through the following steps:
 <ol>
   <li> Enter your name and phone number </li>
   <li> Verify your phone number (we'll send it a text message) </li>
   <li> Tell us how to forward OK notifications to your friends </li>
-</ol>
+</ol>-->

@@ -68,7 +68,10 @@ class Post(db.Model):
       posList.append(self.positionText)
     if not self.lat == 0 and self.lon == 0:
       posList.append('Lat/lon: %f, %f' % (self.lat, self.lon))
-    posStr = '<br/>'.join(posList)
+    if posList:
+      posStr = '<br/>'.join(posList)
+    else:
+      posStr = '(none)'
     return mark_safe("""
 <tr>
   <td class="messagePost">%s</td>

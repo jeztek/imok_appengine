@@ -1,8 +1,8 @@
 
 body {
     margin: 0px; padding: 0px;
-    font-family: tahoma,sans-serif,arial,helvetica;
-    background-color: #FFFDEA;
+    font-family: arial,tahoma,sans-serif,arial,helvetica;
+    background-color: #FFFFFF;
 }
 
 .padded {
@@ -77,38 +77,26 @@ input[type=text],input[type=password] {
     padding: 8px;
 }
 
-input[type=text]:focus,input[type=password]:focus {
-    outline: none;
-    border: solid 1px #AAA;
-    background: #FCFCFC;
-}
+
+
 
 input[type=submit] {
-    margin-top: 10px;
-    border: solid 1px #AAA;
     font-size: 18px;
     padding: 5px;
 }
 
 /* ------ Begin Otavio's lame css attempt ------ */
-#remove-button {
-    margin-top: 0px;
-    border: solid 1px #600000;
-    font-size: 16px;
-    padding: 0px;
-    background-color: #ddd0c0;
-}
 /* HEADER */
 
-#header { position:relative; height:64px; background:#600000; }
-#header h1#logo { margin:0; height:64px; position:absolute; }
+#header { position:relative; height:50px; background-image: url(/static/img/BlueFade.png); background-repeat:repeat-x; border-bottom: 1px solid #000;}
+#header h1#logo { margin:0; padding:5px; height:40px; position:absolute; }
 #header img { margin:0; padding:0; border:none; }
 
 /* NAV */
 
 #nav-global { position:absolute; margin:0; bottom:0; right:0px; white-space:nowrap; font-weight:bold; font-size:14px; }
 #nav-global li { display:block; float:left; list-style-type:none; margin:0; padding:0; }
-#nav-global a { color:#ffef00; display:block; float:left; padding:5em 16px 10px 16px; background:#600000; }
+#nav-global a { color:#ffffff; display:block; float:left; padding:5em 16px 16px 16px; }
 #nav-global a:hover { color:white; background:#04351d; }
 
 .errorlist {
@@ -123,3 +111,7 @@ input[type=submit] {
 table .messagePost {
   border-width: 1px;
 }
+/*wizard*/
+
+#wizardContent{background-color:#f1f2f2; margin-top: 25px; padding: 25px; border-top: 1px solid #ccc; }
+	.nextButton{text-align:right;}
