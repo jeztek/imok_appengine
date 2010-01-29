@@ -81,7 +81,14 @@ class Post(db.Model):
 """ % (timeStr, posStr, self.message))
 
 class SmsMessage(db.Model):
-  sha_hash     = db.StringProperty(required=True)
-  received     = db.DateTimeProperty()
-  phone_number = db.StringProperty()
-  message      = db.StringProperty()
+  phone_number = db.StringProperty(required=True)
+  message      = db.StringProperty(required=True)
+  direction    = db.StringProperty(required=True, 
+                                   choices=set(['incoming', 'outgoing']), 
+                                   default='outgoing')
+  status       = db.StringProperty(required=True,
+                                   choices=set(['queued', 'sent', 'delivered',
+                                                'processed']),
+                                   default="queued")
+  create_time  = db.DateTimeProperty(auto_now_add=True)
+
