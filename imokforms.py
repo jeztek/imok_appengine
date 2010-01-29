@@ -40,11 +40,13 @@ class UserProfileForm(djangoforms.ModelForm):
 
     phone = getPhone(createIfNeeded=True)
     newNumber = self._cleaned_data()['phoneNumber']
-    if newNumber != phone.number:
+    phoneChanged = (newNumber != phone.number)
+    if phoneChanged:
       phone.number = newNumber
       phone.code = ''
       phone.verified = False
       phone.put()
+    return phoneChanged
   
   class Meta:
     model = ImokUser
