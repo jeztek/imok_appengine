@@ -7,6 +7,7 @@ from google.appengine.ext.webapp.util import login_required
 from google.appengine.api import mail
 
 # must import template before importing django stuff
+import django.core.validators
 from google.appengine.ext.db import djangoforms
 try:
   from django import newforms as forms
@@ -128,30 +129,24 @@ class RegisterEmailHandler(RequestHandlerPlus):
   def get(self):
     registeredEmailQuery = RegisteredEmail.all().filter('userName =', users.get_current_user()).order('emailAddress')
     registeredEmailList = registeredEmailQuery.fetch(100)
-    
-    logout_url = users.create_logout_url("/")
-
     self.render('register_email.html', self.getContext(locals()))
 
-class AddRegisteredEmailHandler(RequestHandlerPlus):
   def post(self):
     if users.get_current_user():
       newEmail = RegisteredEmail()
       newEmail.userName = users.get_current_user()
       success = True
+      tempEmailString = self.request.get('emailAddress')
+      newEmail.emailAddress = tempEmailString
       try:
-        # can't not remember to validate email
-        tempEmailString = self.request.get('emailAddress')
-        newEmail.emailAddress = tempEmailString
-        # WHY DOESN'T THIS WORK? I SUCK. do I need a real mail server for this? -OTAVIO
-        if not mail.is_email_valid(tempEmailString):
-          success = False
-      except:
-        success = False
+        django.core.validators.isValidEmail(tempEmailString, None)
+      except django.core.validators.ValidationError:
+        addError = 'Please enter a valid e-mail address.'
       else:
-        if success:
-          newEmail.put()
-    self.redirect(self.request.get('returnAddr'))
+        newEmail.put()
+    registeredEmailQuery = RegisteredEmail.all().filter('userName =', users.get_current_user()).order('emailAddress')
+    registeredEmailList = registeredEmailQuery.fetch(100)
+    self.render('register_email.html', self.getContext(locals()))
 
 class RemoveRegisteredEmailHandler(RequestHandlerPlus):
   def post(self):
@@ -251,7 +246,7 @@ def main():
 
     # must be logged in for these...
     ('/email', RegisterEmailHandler),
-    ('/email/add', AddRegisteredEmailHandler),
+    #('/email/add', AddRegisteredEmailHandler),
     ('/email/remove', RemoveRegisteredEmailHandler),
     ('/phone/verify', VerifyPhoneHandler),
     ('/phone/confirm', ConfirmPhoneHandler),
