@@ -13,14 +13,6 @@ body { font-family:arial; }
   font-weight: normal;
   padding-top:10px;
 }
-#signup {
-  background-image: url(signup.png);
-  width: 280px;
-  height: 302px;
-  color: #fff;
-  padding-top: 80px;
-  padding-left: 20px;
-}
 .signupItem {
   padding:10px;
   font-weight:bold;
@@ -46,53 +38,49 @@ body { font-family:arial; }
 
 {% block body %}
 
-<table>
-<tr>
 
-<td valign="top" style="padding-top:15px; width: 30%;">
-  <p>Downloads:
-<ul>
-  <li><a href="/download/blackberry-1.0.foo" class="biglink"><i>I'm OK!</i> app for Blackberry Bold, v1.0</a></li>
-</ul></p>
-</td>
 
-<td valign="top" style="padding-top:15px">
 
-<p><i>I'm OK!</i> is a web site and mobile app that allows you to tell your
-friends and loved ones that you're OK in the event of an emergency
-or disaster situation.</p>
+  <style>
+  a {border: 0px;}
+  img{border: 0px;}
+  body {font-family:arial;}
+  #superTitle{font-size: 24px; font-weight: bold;}
+  #content{font-size: 16px; font-weight: normal;padding-top:10px;}
+  #gradientContainer{background-image: url(/static/img/gradient.png); background-repeat: repeat-x; height: 485px; margin: 0px -25px 0px -25px;border-bottom: 1px solid #777;}
+  #mainImage{background-image:url(/static/img/texting.jpg); position:relative;}
+  #signup{position:absolute; right:78px; top:315px;}
+  .logoBox{float:left;width:30%;display:block; text-align:center;}
+      
+  </style>
 
-<p><strong>NOTE:</strong> This web site is not yet ready for public use!</p>
 
-<p>In an urban disaster, cell phone networks are often overwhelmed as
-everyone calls their family and friends to check on them.  But it
-doesn't have to be that way -- text messages take only a fraction of the
-bandwidth required for voice calls, and they often get through when
-voice calls can't.  When you run the <i>I'm OK!</i> app on your phone, it
-helps you send a single &quot;I'm OK&quot; text message to our server,
-which then relays the message to a list of your friends by e-mail.<p>
+<center>
+<div id="gradientContainer">
+  <div id="mainImage" style="width:678px; height: 450px; margin-top: 25px; text-align:left">
+  
+  
+  
+  
+  
+   <div id="signup">
+        <a href="/home" ><img src="/static/img/signup_button.png"></a>
+      </div>
 
-<p>The original prototype of <i>I'm OK!</i> won First Prize at the first <a
-href="http://www.rhok.org">Random Hacks of Kindness</a> codejam in
-November 2009.
 
-<p><b>For more information</b></p>
+    
+    
+  </div>
+</div>
+<div style="width:678px; margin-top: 0px;text-align:left">
+<p style="text-align: center"><i>We are grateful for help from</i></p>
 
-<ul>
-  <li><a href="/static/pdf/imok.pdf">Overview slides</a>
-  <li><a href="http://groups.google.com/group/imok-users">User forum</a></li>
-  <li><a href="/getInvolved">How you can get involved</a>
-</ul>
+<a class="logoBox" href="http://www.rhok.org/"><img style="border: none;" src="/static/img/rhok_logo.png" width="143" height="59"/></a>
+<a class="logoBox" href="http://www.google.com/"><img style="border: none;" src="/static/img/google_logo.png" width="151" height="60"/></a>
+<a class="logoBox" href="http://www.nasa.gov/"><img style="border: none;" src="/static/img/nasa_logo.png" width="72" height="60"/></a>
+</div>
+</center>
 
-<p><b>We are grateful for help from:</b></p>
 
-<a href="http://www.rhok.org/"><img style="border: none;" src="/static/img/rhok_logo.png" width="143" height="59"/></a>
-<a href="http://www.google.com/"><img style="border: none;" src="/static/img/google_logo.png" width="151" height="60"/></a>
-<a href="http://www.nasa.gov/"><img style="border: none;" src="/static/img/nasa_logo.png" width="72" height="60"/></a>
-
-</td>
-</tr>
-
-</table>
 
 {% endblock body %}
