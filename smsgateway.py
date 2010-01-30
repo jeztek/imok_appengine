@@ -43,20 +43,19 @@ class IncomingHandler(webapp.RequestHandler):
     objects = [ sms_message ]
 
     phone_entity = Phone.all().filter('number =', phone).get()
-    post = None
-    if phone_entity:
-      post = Post.fromText(message)
-      post.unique_id = Post.gen_unique_key()
-      post.user = phone_entity.user
-      objects.append(post)
-
-      sms_message.status = 'queued'
-		
-    db.put(objects)
 
     if not phone_entity:
+      db.put(objects)
       self.response.out.write(json.dumps({'result': 'ok'}))
       return
+
+    post = Post.fromText(message)
+    post.unique_id = Post.gen_unique_key()
+    post.user = phone_entity.user
+    objects.append(post)
+    sms_message.status = 'queued'
+
+    db.put(objects)
 
     imok_user = ImokUser.all().filter('account =', phone_entity.user).get()
     email_query = RegisteredEmail.all().filter('userName =', phone_entity.user).order('emailAddress')
@@ -76,9 +75,15 @@ class IncomingHandler(webapp.RequestHandler):
                      bcc=addresses,
                      subject="I'm OK",
                      body=body)
-      sms_message.status = 'processed'
-      sms_message.put()
-        
+
+    sms_message.status = 'processed'
+    response_sms = SmsMessage(phone_number=phone,
+                              message="I'm OK: Message received. %d contact(s) notified." % len(addresses),
+                              direction="outgoing",
+                              status="queued")
+
+    db.put([ response_sms, sms_message ])
+
     #self.response.out.write(message)
     self.response.out.write(json.dumps({'result': 'ok'}))
 
