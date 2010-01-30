@@ -89,7 +89,7 @@ input[type=submit] {
 /* HEADER */
 
 #header { position:relative; height:50px; background-image: url(/static/img/BlueFade.png); background-repeat:repeat-x; border-bottom: 1px solid #000;}
-#header h1#logo { margin:0; padding:5px; height:40px; position:absolute; }
+#header h1#logo { margin:0; padding:2px 10px; height:40px; position:absolute; }
 #header img { margin:0; padding:0; border:none; }
 
 /* NAV */
