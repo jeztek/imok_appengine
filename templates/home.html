@@ -97,6 +97,10 @@ table.profileWidget td {
   <th>Name:</th>
   <td>{{ profile.firstName}} {{profile.lastName }}</td>
 </tr>
+<tr>
+  <th>Preferred time zone:</th>
+  <td>{{ profile.tz }}</td>
+</tr>
 {% for phone in phones %}
 <tr>
   <th>Phone:</th>
