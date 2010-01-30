@@ -25,7 +25,6 @@ class Phone(db.Model):
   number = db.StringProperty()       # Phone number
   verified = db.BooleanProperty(default=False)    # Whether they have verified it or not
   code = db.StringProperty(default='')         # Verification code
-  code_time = db.DateTimeProperty()
 
   @classmethod
   def is_valid_number(cls, number):

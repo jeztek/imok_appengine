@@ -147,12 +147,73 @@ class DownloadsHandler(RequestHandlerPlus):
 class VerifyPhoneHandler(RequestHandlerPlus):
   @login_required
   def get(self):
-    # FIX implement me
+    phone = getPhone()
+    if not phone:
+      self.redirect('/home')
+      return
+
     self.render('verifyPhone.html', self.getContext(locals()))
 
   def post(self):
-    # FIX implement me
+    if not users.get_current_user():
+      self.redirect('/')
+      return
+
+    redir_location = self.request.get('continue', '/home')
+
+    phone = getPhone()
+    if not phone:
+      self.redirect(redir_location)
+      return
+
+    # Generate a code
+    phone.code = Phone.generate_code()
+    message = "Verification Code: %s" % phone.code
+    sms = SmsMessage(phone_number=phone.number, 
+                     message=message)
+    db.put([sms, phone])
+
+    self.redirect(redir_location)
+
+class ConfirmPhoneHandler(RequestHandlerPlus):
+  @login_required
+  def get(self):
+    phone = getPhone()
+    if not phone:
+      self.redirect('/home')
+      return
+
+    self.render('confirmPhone.html', self.getContext(locals()))
+
+  def post(self):
+    if not users.get_current_user():
+      self.redirect('/')
+      return
+
+    phone = getPhone()
+    if not phone:
+      self.redirect('/home')
+      return
+
+    errorlist = []
+    code = self.request.get('code', '')
+    if not code:
+      errorlist.append('Must enter a code')
+    elif len(code) != 4:
+      errorlist.append('Code is only 4 digits')
+    elif code != phone.code:
+      errorlist.append('Incorrect code')
+
+    if errorlist:
+      self.render('confirmPhone.html', self.getContext(locals()))
+      return
+
+    phone.code = ''
+    phone.verified = True
+    phone.put()
+
     self.redirect('/home')
+
 
 def main():
   application = webapp.WSGIApplication([
@@ -164,6 +225,7 @@ def main():
     ('/email/add', AddRegisteredEmailHandler),
     ('/email/remove', RemoveRegisteredEmailHandler),
     ('/phone/verify', VerifyPhoneHandler),
+    ('/phone/confirm', ConfirmPhoneHandler),
     ('/profile/edit', EditProfileHandler),
     ('/download', DownloadsHandler),
                                         

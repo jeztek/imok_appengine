@@ -13,10 +13,30 @@
 
 		<div>
 			<b>Verify Phone</b><br/>
-			<span style="font-size: 0.8em;">PLACEHOLDER: Verify your phone number</span><br/><br/>
+			<span style="font-size: 0.8em;">
+                        To use this phone, it first must be verified.
+			To start this process, press the "Send
+			Code".  A 4-digit code will
+                        be sent to {{phone.number_str}}.<br/>
+                        <br/>
+                        You may skip this for
+			now, but you <i>must</i> complete this step
+			before you can use the phone with this
+			service.
+                        </span><br/><br/>
 
-		<div class="nextButton">
-			<input type="submit" value="Next" onclick="document.location = '/newuser/contacts';">
+                        <div class="nextButton">
+                         <form action="/phone/verify" method="post">
+		         <div>
+			     <input type="submit" name="verify"
+                                    value="Send Code"">
+                             <input type="hidden" name="continue"
+                                    value="/newuser/confirmPhone">
+                             &nbsp;<a href="/newuser/contacts">Skip</a>
+		         </div>
+                         </form>
+                        </div>
+             
 		</div>
 		</div>
 
