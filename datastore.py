@@ -100,6 +100,9 @@ class Post(db.Model):
         post.lon = m.group(2)
     post.positionText = atText
     return post
+
+  def permalink(self, host=''):
+    return "%s/message?unique_id=%s" % (host, self.unique_id)
       
   def asWidgetRow(self):
     meta = ''
@@ -109,7 +112,7 @@ class Post(db.Model):
     if self.positionText:
       meta += ' at %s' % self.positionText
     if not (self.lat == 0 and self.lon == 0):
-      meta += ' <a href="/message?unique_id=%s">map</a>' % self.unique_id
+      meta += ' <a href="%s">map</a>' % self.permalink()
     return mark_safe("""
 <div class="widgetItem">
   <a href="/message?unique_id=%s">%s</a>
@@ -125,7 +128,7 @@ class SmsMessage(db.Model):
                                    default='outgoing')
   status       = db.StringProperty(required=True,
                                    choices=set(['queued', 'sent', 'delivered',
-                                                'processed', 'lost']),
+                                                'fresh', 'processed', 'unclaimed']),
                                    default="queued")
   create_time  = db.DateTimeProperty(auto_now_add=True)
 

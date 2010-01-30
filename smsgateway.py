@@ -32,7 +32,7 @@ class IncomingHandler(webapp.RequestHandler):
     sms_message = SmsMessage(phone_number=phone, 
                          message=message, 
                          direction='incoming',
-                         status='lost')
+                         status='unclaimed')
     objects = [ sms_message ]
 
     phone_entity = Phone.all().filter('number =', phone).get()
@@ -42,7 +42,7 @@ class IncomingHandler(webapp.RequestHandler):
       post.user = phone_entity.user
       objects.append(post)
 
-      sms_message.status = 'processed'
+      sms_message.status = 'queued'
 		
     db.put(objects)
 

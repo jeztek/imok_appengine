@@ -47,6 +47,8 @@ class DebugPostHandler(RequestHandlerPlus):
     if not user:
       self.redirect("/")
 
+    okUser = ImokUser.all().filter('account =', user).get()
+
     p = Post(user=user, message='test message', lat=37., lon=-122.)
     p.unique_id = Post.gen_unique_key()
     p.put()
@@ -56,25 +58,24 @@ class DebugPostHandler(RequestHandlerPlus):
     for registeredEmail in registeredEmailQuery:
       addresses.append(registeredEmail.emailAddress)
       
+
+    templateData = {
+      'post': p.message,
+      'link': p.permalink(self.request.host_url),
+      'user': okUser
+      }
+    emailBody = template.render(settings.template_path('email.txt'), templateData)
+
     if (len(addresses) > 0):
       mail.send_mail(sender=users.get_current_user().email(),
                      to=users.get_current_user().email(),
                      bcc=addresses,
                      subject="I'm OK",
-                     body="""
-Dear Registered User:
-
-This is an auto generated email please do not reply. You are registered to receive emails
-regarding the status of USER. This email lets you know they are OK.
-
-For more information, click the link below.
-
-""" + self.request.host_url + "/message?unique_id=" + str(p.unique_id) +
-"""
-Please let us know if you have any questions.
-
-The ImOK.com Team
-""")
+                     body=emailBody)
+      self.response.headers['Content-Type'] = 'text/plain'
+      self.response.out.write(emailBody)
+      return
+    
     self.redirect('/home')
     
 def main():
