@@ -8,6 +8,12 @@
             <th>from</th>
             <td>{{ user.firstName }} {{ user.lastName }} &lt;{{ user.account }}&gt;</td>
           </tr>
+          {% if idMessage.positionText %}
+	  <tr>
+            <th>location</th>
+            <td>{{ idMessage.positionText }}</td>
+          </tr>
+          {% endif %}
         </table>
         <br/>
 	<div class="theMessage">{{ idMessage.message }}</div>
