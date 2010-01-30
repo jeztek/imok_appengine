@@ -3,12 +3,6 @@
 {% block head %}
 <style type="text/css">
 
-.widgetBox {
-  background-color: #eeeeee;
-  padding: 10px;
-  margin-bottom: 20px;
-}
-
 .homeWidgetTitle {
   font-weight: bold;
 }
@@ -58,6 +52,31 @@ table.profileWidget td {
   padding-right: 5px;
 }
 
+.widget {
+  margin: 10px;
+  padding: 10px;
+}
+
+.widgetTitle {
+  border-bottom: 1px solid #777;
+  font-weight: bold;
+  font-size: 1.2em;
+  padding: 5px 0px;
+}
+.widgetAction{
+  margin-top: 5px;
+  float: right;
+  font-size: 0.8em;
+  font-weight: normal;
+}
+.widgetItem{
+  padding: 5px 0px;
+}
+.meta {
+  font-size: 0.8em;
+  color: #777;
+}
+
 </style>
 {% endblock head %}
 
@@ -65,9 +84,14 @@ table.profileWidget td {
 
 <table class="homeLayout"><tr><td class="homeLayout">
 
-<div class="widgetBox">
-<div class="homeWidgetTitle">Profile</div>
+<div class="widget">
+<div class="widgetTitle">Profile
+  <div class="widgetAction">
+    <a href="/profile/edit">edit</a>
+  </div>
+</div>
 
+<p>
 <table class="profileWidget">
 <tr>
   <th>Name:</th>
@@ -76,17 +100,25 @@ table.profileWidget td {
 {% for phone in phones %}
 <tr>
   <th>Phone:</th>
-  <td>{{ phone }}</td>
+  <td>{{ phone.number_str }}</td>
 </tr>
 {% endfor %}
 </table>
+</p>
+
 </div>
 
-<div class="widgetBox">
-<div class="homeWidgetTitle">E-mail contacts</div>
+<div class="widget">
+<div class="widgetTitle">E-mail contacts
+  <div class="widgetAction">
+    <a href="/email">edit</a>
+  </div>
+</div>
 
 <p>When you post an <i>I'm OK!</i> message, these people will
 be notified by e-mail.</p>
+
+<p>
 {% if emails %}
   {% for email in emails %}
     <div style="padding-left: 20px;">{{ email.emailAddress }}{% if not forloop.last %},{% endif %}</div>
@@ -95,37 +127,31 @@ be notified by e-mail.</p>
     <div style="font-style: italic;">... and {{ numEmailsNotShown }} more not shown.</div>
   {% endif %}
 {% else %}
-  <p>[No e-mail contacts set.]</p>
+  [No e-mail contacts set.]
 {% endif %}
-<p><a href="/email">Edit e-mail contacts</a></p>
+</p>
 </div>
 
 </td>
 <td class="homeLayout">
 
-<div class="widgetBox">
-<div class="homeWidgetTitle">Message history</div>
+<div class="widget">
+<div class="widgetTitle">Recent messages you sent
+  <div class="widgetAction">
+    <a href="/posts/detail">details</a>
+  </div>
+</div>
 
 {% if posts %}
 <p>
-<table border="1" class="messagePost">
-  <tr>
-    <th>Time</th>
-    <th>Position</th>
-    <th>Message</th>
-  </tr>
 {% for post in posts %}
-  {{ post.asTableRow }}
+  {{ post.asWidgetRow }}
 {% endfor %}
-</table>
 </p>
 
-<p><a href="/posts/detail">
-View more details
 {% if numPostsNotShown %}
-and {{ numPostsNotShown }} older messages</a></p>
+  <p>Showing most recent {{ posts|length }} of {{ numPosts }} posts.</p>
 {% endif %}
-</a></p>
 
 {% else %}
 <p>[You haven't posted any messages yet]</p>

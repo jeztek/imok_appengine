@@ -13,7 +13,9 @@
 			<b>Edit Profile Information</b><br/>
 
 			<form method="post" action="/profile/edit">
-			{{ form.as_p }}
+                        <table class="profileForm">
+			{{ form }}
+                        </table>
 <p>* Number of your phone that you will use to send <i>I'm OK!</i> text messages.
 Must be a 10-digit US phone number.</p>
 			<div class="nextButton">

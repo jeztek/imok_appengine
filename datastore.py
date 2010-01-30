@@ -61,24 +61,19 @@ class Post(db.Model):
   positionText = db.StringProperty(default='')
   message  = db.StringProperty()
 
-  def asTableRow(self):
-    timeStr = self.datetime.strftime('%b %d %H:%M')
-    posList = []
+  def asWidgetRow(self):
+    meta = ''
+    meta += self.datetime.strftime('%b %d %H:%M')
     if self.positionText:
-      posList.append(self.positionText)
-    if not self.lat == 0 and self.lon == 0:
-      posList.append('Lat/lon: %f, %f' % (self.lat, self.lon))
-    if posList:
-      posStr = '<br/>'.join(posList)
-    else:
-      posStr = '(none)'
+      meta += ' at %s' % self.positionText
+    if not (self.lat == 0 and self.lon == 0):
+      meta += ' <a href="/post/%s">map</a>' % self.key()
     return mark_safe("""
-<tr>
-  <td class="messagePost">%s</td>
-  <td class="messagePost">%s</td>
-  <td class="messagePost">%s</td>
-</tr>
-""" % (timeStr, posStr, self.message))
+<div class="widgetItem">
+  <a href="/post/%s">%s</a>
+  <span class="meta">%s</span>
+</div>
+""" % (self.key(), self.message, meta))
 
 class SmsMessage(db.Model):
   sha_hash     = db.StringProperty(required=True)

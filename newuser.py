@@ -26,7 +26,7 @@ class NewUserProfileHandler(RequestHandlerPlus):
     profile = getProfile(True)
     phone = getPhone()
     if phone:
-      initial = dict(phoneNumber=phone.number)
+      initial = dict(phoneNumber=phone.number_str())
     else:
       initial = None
     form = UserProfileForm(instance=profile, initial=initial)
