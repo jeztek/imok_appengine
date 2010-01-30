@@ -77,10 +77,27 @@ table.profileWidget td {
   color: #777;
 }
 
+.banner {
+  padding-top: 10px;
+  padding-left: 30px;
+}
+
+.banner span {
+  font-weight: bold;
+  font-size: 1.3em;
+  background-color: yellow;
+  padding-left: 10px;  
+  padding-right: 10px;  
+}
+
 </style>
 {% endblock head %}
 
 {% block body %}
+
+{% if banner %}
+<div class="banner"><span>{{ banner }}</span></div>
+{% endif %}
 
 <table class="homeLayout"><tr><td class="homeLayout">
 

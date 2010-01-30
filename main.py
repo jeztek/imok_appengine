@@ -13,6 +13,11 @@ try:
 except ImportError:
   from django import forms
 import django.core.exceptions
+try:
+  from django.utils.safestring import mark_safe
+except ImportError:
+  def mark_safe(s):
+    return s
 
 import settings
 from datastore import *
@@ -86,6 +91,10 @@ class HomeHandler(RequestHandlerPlus):
     profile = getProfile()
     if not profile:
         self.redirect('/newuser/profile')
+
+    phone = getPhone()
+    if phone and not phone.verified:
+      banner = mark_safe('You must <a href="/phone/verify">finish verifying your phone number</a> before you can post messages.')
 
     # profile widget
     phonesQuery = Phone.all().filter('user = ', user)
