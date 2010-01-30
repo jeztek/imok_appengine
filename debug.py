@@ -60,7 +60,7 @@ class DebugPostHandler(RequestHandlerPlus):
       
 
     templateData = {
-      'post': p.message,
+      'message': p.message,
       'link': p.permalink(self.request.host_url),
       'user': okUser
       }
