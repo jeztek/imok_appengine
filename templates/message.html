@@ -6,8 +6,11 @@
 	<div id="wizardContent">
 
 		<div>
-			<b>This is the awesome message:</b><br/>
-			Help me! I'm so hurt. The sky is falling. Ouch. Charlie bit me and it still hurts.<br/>
+		<br/>
+			<b>This is the sms message:</b><br/>
+			{{ idMessage.message }}<br/>
+			Sent : {{ dateTime }}<br/>
+
 
 
 
@@ -34,7 +37,7 @@
     function initialize() {
       if (GBrowserIsCompatible()) {
         var map = new GMap2(document.getElementById("map_canvas"));
-        var point = new GLatLng(37.77493,-122.419416);
+        var point = new GLatLng({{lat}},{{lon}});//37.77493,-122.419416);
         map.setCenter(point, 12);
         map.setUIToDefault();
 
@@ -80,7 +83,7 @@
 
 
   <body onload="initialize()" onunload="GUnload()">
-    <div id="map_canvas" style="width: 600px; height: 480px"></div>
+    <div id="map_canvas" style="width: 600px; height: 400px"></div>
   </body>
 
 

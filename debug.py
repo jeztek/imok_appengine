@@ -67,6 +67,10 @@ Dear Registered User:
 This is an auto generated email please do not reply. You are registered to receive emails
 regarding the status of USER. This email lets you know they are OK.
 
+For more information, click the link below.
+
+""" + self.request.host_url + "/message?unique_id=" + str(p.unique_id) +
+"""
 Please let us know if you have any questions.
 
 The ImOK.com Team

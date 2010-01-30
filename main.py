@@ -54,7 +54,12 @@ class MessageHandler(RequestHandlerPlus):
         mustLogIn = "True" # this is so the navigation bar only shows the relevant things.
         login_url = users.create_login_url("/home")
 
-    uniqueID = self.request.get('uniqueID')
+    unique_id = self.request.get('unique_id')
+    idQuery = Post.all().filter('unique_id = ', unique_id)
+    idMessage = idQuery.get()
+    lat = str(idMessage.lat)
+    lon = str(idMessage.lon)
+    dateTime = str(idMessage.datetime)
 
     self.render('message.html', self.getContext(locals()))
 

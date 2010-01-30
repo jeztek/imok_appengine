@@ -85,10 +85,10 @@ class Post(db.Model):
       meta += ' <a href="/post/%s">map</a>' % self.key()
     return mark_safe("""
 <div class="widgetItem">
-  <a href="/post/%s">%s</a>
+  <a href="/message?unique_id=%s">%s</a>
   <span class="meta">%s</span>
 </div>
-""" % (self.key(), self.message, meta))
+""" % (self.unique_id, self.message, meta))
 
 class SmsMessage(db.Model):
   phone_number = db.StringProperty(required=True)
