@@ -7,7 +7,6 @@ from google.appengine.ext.webapp.util import login_required
 from google.appengine.api import mail
 
 # must import template before importing django stuff
-import django.core.validators
 from google.appengine.ext.db import djangoforms
 try:
   from django import newforms as forms
@@ -139,18 +138,14 @@ class RegisterEmailHandler(RequestHandlerPlus):
     self.render('register_email.html', self.getContext(locals()))
 
   def post(self):
-    if users.get_current_user():
-      newEmail = RegisteredEmail()
-      newEmail.userName = users.get_current_user()
-      success = True
-      tempEmailString = self.request.get('emailAddress')
-      newEmail.emailAddress = tempEmailString
-      try:
-        django.core.validators.isValidEmail(tempEmailString, None)
-      except django.core.validators.ValidationError:
-        addError = 'Please enter a valid e-mail address.'
-      else:
-        newEmail.put()
+    if not users.get_current_user():
+      self.redirect('/')
+    emailString = self.request.get('emailAddress')
+    emailError = getEmailErrorIfAny(emailString)
+    if not emailError:
+      newEmail = RegisteredEmail(userName=users.get_current_user(),
+                                 emailAddress=emailString)
+      newEmail.put()
     registeredEmailQuery = RegisteredEmail.all().filter('userName =', users.get_current_user()).order('emailAddress')
     registeredEmailList = registeredEmailQuery.fetch(100)
     self.render('register_email.html', self.getContext(locals()))

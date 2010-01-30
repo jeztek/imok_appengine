@@ -19,7 +19,7 @@ class ImokUser(db.Model):
   account = db.UserProperty()
   firstName = db.StringProperty(verbose_name='First name')
   lastName = db.StringProperty(verbose_name='Last name')
-  tz = db.StringProperty(default='US/Pacific', choices=TZ_CHOICES, verbose_name='Preferred time zone')
+  tz = db.StringProperty(default='America/Port-au-Prince', choices=TZ_CHOICES, verbose_name='Preferred time zone')
 
 class Phone(db.Model):
   """

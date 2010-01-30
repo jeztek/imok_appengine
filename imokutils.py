@@ -1,7 +1,9 @@
+import sys
 
 from google.appengine.api import users
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template, util
+import django.core.validators # can't import django before appengine
 
 from datastore import ImokUser, Phone
 import settings
@@ -48,3 +50,11 @@ class RequestHandlerPlus(webapp.RequestHandler):
   def render(self, tmplName, tmplValues, contentType='text/html'):
     self.response.headers['Content-Type'] = contentType
     self.response.out.write(template.render(settings.template_path(tmplName), tmplValues))
+
+def getEmailErrorIfAny(email):
+  try:
+    django.core.validators.isValidEmail(email, None)
+  except django.core.validators.ValidationError, exc:
+    return 'Enter a valid e-mail address'
+  else:
+    return None
