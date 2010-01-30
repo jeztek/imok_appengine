@@ -61,6 +61,7 @@ class MessageHandler(RequestHandlerPlus):
     lon = str(idMessage.lon)
     dateTime = str(idMessage.datetime)
     user = ImokUser.all().filter('account = ', idMessage.user).get()
+    key = settings.MAPS_KEY
 
     self.render('message.html', self.getContext(locals()))
 
