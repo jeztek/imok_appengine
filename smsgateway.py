@@ -11,14 +11,20 @@ from google.appengine.ext.webapp import util
 
 import settings as s
 
+def secret_required(handler_method):
+  def check_secret(self, *args):
+    if self.request.get('secret', '') != s.GATEWAY_SECRET:
+      self.error(404)
+      self.response.headers['Content-Type'] = 'text/plain'
+      self.response.out.write("404 - Not Found\n")
+      return
+    handler_method(self, *args)
+  return check_secret
+
 class IncomingHandler(webapp.RequestHandler):
+  @secret_required
   def post(self):
     self.response.headers['Content-Type'] = 'text/json'
-
-    if self.request.get('secret', '') != s.GATEWAY_SECRET:
-      self.error(403)
-      self.response.out.write(json.dumps({ 'result': 'error', 'message': 'no' }))
-      return
 
     phone = Phone.normalize_number(self.request.get('phone'))
     message = self.request.get('message')
@@ -50,13 +56,9 @@ class IncomingHandler(webapp.RequestHandler):
     self.response.out.write(json.dumps({'result': 'ok'}))
 
 class OutgoingHandler(webapp.RequestHandler):
+  @secret_required
   def post(self):
     self.response.headers['Content-Type'] = 'text/json'
-
-    if self.request.get('secret', '') != s.GATEWAY_SECRET:
-      self.error(403)
-      self.response.out.write(json.dumps({ 'result': 'error', 'message': 'no' }))
-      return
 
     # Handle any messages the phone sent
     sent_messages_str = self.request.get('messages', '[]')
