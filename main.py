@@ -93,12 +93,12 @@ class HomeHandler(RequestHandlerPlus):
 
     # emails widget
     emailsQuery = RegisteredEmail.all().filter('userName = ', user)
-    emails = emailsQuery.fetch(3)
+    emails = emailsQuery.fetch(5)
     numEmailsNotShown = emailsQuery.count() - len(emails)
 
     # recent messages widget
     postsQuery = Post.all().filter('user = ', user).order('-datetime')
-    posts = postsQuery.fetch(2)
+    posts = postsQuery.fetch(10)
     numPosts = postsQuery.count()
     numPostsNotShown = numPosts - len(posts)
     

@@ -1,17 +1,23 @@
+import re, random, sys
 
+from google.appengine.api import users
 from google.appengine.ext import db
+import pytz
 try:
   from django.utils.safestring import mark_safe
 except ImportError:
   def mark_safe(s):
     return s
 
-import re, random
+from timeutils import *
+
+TZ_CHOICES = ['America/Port-au-Prince', 'US/Pacific', 'US/Eastern'] + pytz.common_timezones
 
 class ImokUser(db.Model):
   account = db.UserProperty()
   firstName = db.StringProperty(verbose_name='First name')
   lastName = db.StringProperty(verbose_name='Last name')
+  tz = db.StringProperty(default='US/Pacific', choices=TZ_CHOICES, verbose_name='Preferred time zone')
 
 class Phone(db.Model):
   """
@@ -62,7 +68,9 @@ class Post(db.Model):
 
   def asWidgetRow(self):
     meta = ''
-    meta += self.datetime.strftime('%b %d %H:%M')
+    displayUser = users.get_current_user()
+    localTzName = ImokUser.all().filter('account =', displayUser).fetch(1)[0].tz
+    meta += formatLocalFromUtc(self.datetime, localTzName)
     if self.positionText:
       meta += ' at %s' % self.positionText
     if not (self.lat == 0 and self.lon == 0):
