@@ -13,7 +13,14 @@
 
 		<div>
 			<b>Add E-Mail Contacts</b><br/>
-			<span style="font-size: 0.8em;">Enter e-mails of people you'd like to notify with <i>I'm OK!</i></span><br/><br/>
+			<div class="newUserInstructions">
+                        Enter e-mails of people you'd like to notify with <i>I'm OK!</i>
+                        <br/><br/>
+                        You may skip this for
+			now, but you <i>must</i> complete this step
+			before you can use the phone with this
+			service.<br/><br/>
+                        </div>
                         {% if emailError %}
                         <div class="errorlist">{{ emailError }}</div>
                         {% endif %}
@@ -37,9 +44,14 @@
 			</table>
                         {% endif %}
 		</div>
+                {% if registeredEmailList %}
 		<div class="nextButton">
 			<input type="submit" value="Next" onclick="document.location = '/newuser/download';">
 		</div>
+                {% else %}
+                <br/>
+                <div class="nextButton"><a href="/newuser/download">Skip</a></div>
+                {% endif %}
 	</div>
 </div>
 

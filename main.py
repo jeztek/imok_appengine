@@ -99,10 +99,6 @@ class HomeHandler(RequestHandlerPlus):
     if not profile:
         self.redirect('/newuser/profile')
 
-    phone = getPhone()
-    if phone and not phone.verified:
-      banner = mark_safe('You must <a href="/phone/verify">finish verifying your phone number</a> before you can post messages.')
-
     # profile widget
     phonesQuery = Phone.all().filter('user = ', user)
     phones = phonesQuery.fetch(1)
@@ -118,6 +114,12 @@ class HomeHandler(RequestHandlerPlus):
     numPosts = postsQuery.count()
     numPostsNotShown = numPosts - len(posts)
     
+    phone = getPhone()
+    if phone and not phone.verified:
+      banner = mark_safe('You must <a href="/phone/verify">finish verifying your phone number</a> before you can post messages.')
+    elif not emails:
+      banner = mark_safe('You must <a href="/email">add e-mail contacts</a> or no one will get your messages.')
+
     self.render('home.html', self.getContext(locals()))
 
 class GetInvolvedHandler(RequestHandlerPlus):

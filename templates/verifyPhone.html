@@ -11,17 +11,17 @@
 
 		<div>
 			<b>Verify Phone</b><br/>
-			<span style="font-size: 0.8em;">
+			<div class="newUserInstructions">
                         To use this phone, it first must be verified.
 			To start this process, press the "Send
 			Code".  A 4-digit code will
-                        be sent to {{phone.number_str}}.<br/>
-                        <br/>
+                        be sent to {{ phone.number_str }}.
+                        <br/><br/>
                         You may skip this for
 			now, but you <i>must</i> complete this step
 			before you can use the phone with this
-			service.
-                        </span><br/><br/>
+			service.<br/>
+                        </div>
 
                         <div class="nextButton">
                          <form action="/phone/verify" method="post">
