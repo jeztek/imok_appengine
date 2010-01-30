@@ -1,101 +1,44 @@
 {% extends "base.html" %}
 
-{% block body %}
-<center>
-<div style="width:640px; text-align:left;">
-	<div id="wizardContent">
-
-		<div>
-		<br/>
-			<b>This is the sms message:</b><br/>
-			{{ idMessage.message }}<br/>
-			Sent : {{ dateTime }}<br/>
-
-
-
-
-
-
-
-
+{% block head %}
 
     <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAAFc3F2oO92IOeSdh20OvwRTIaxK6J1v0NBsI6tB269QU6Hg_LRSrbrOnRs7NAA_zH6sTW8fJ-5NpgQ&sensor=false"
             type="text/javascript"></script>
     <script type="text/javascript">
-/*
-	function createMarker(point, number) {
-	  var marker = new GMarker(point);
-	  var message = ["This","is","the","secret","message"];
-	  marker.value = number;
-	  GEvent.addListener(marker, "click", function() {
-		var myHtml = "<b>#" + number + "</b><br/>" + message[number -1];
-		map.openInfoWindowHtml(point, myHtml);
-	  });
-	  return marker;
-	}
-*/
     function initialize() {
-      if (GBrowserIsCompatible()) {
-        var map = new GMap2(document.getElementById("map_canvas"));
-        var point = new GLatLng({{lat}},{{lon}});//37.77493,-122.419416);
-        map.setCenter(point, 12);
-        map.setUIToDefault();
+		if (GBrowserIsCompatible()) {
+			var map = new GMap2(document.getElementById("map_canvas"));
+			var point = new GLatLng({{lat}},{{lon}});//37.77493,-122.419416);
+			map.setCenter(point, 12);
+			map.setUIToDefault();
 
-		// Create our "tiny" marker icon
-//		var blueIcon = new GIcon(G_DEFAULT_ICON);
-//		blueIcon.image = "http://www.google.com/intl/en_us/mapfiles/ms/micons/blue-dot.png";
-//		// Set up our GMarkerOptions object
-//		markerOptions = { icon:blueIcon };
-//	    map.addOverlay(new GMarker(point, markerOptions));
+			map.addOverlay(new GMarker(point));
 
-
-	    map.addOverlay(new GMarker(point));
-
-		map.setCenter(point, 13);
-		//map.openInfoWindow(map.getCenter(), document.createTextNode("Name: John Doe\n</br>Phone: 650-555-1212</br>"));
-		map.openInfoWindowHtml(map.getCenter(), "Name: John Doe</br>Phone: 650-555-1212</br>Needs: Evac, Electricity</br>Message: Nobody was hurt");
-
-		var bounds = map.getBounds();
-		var southWest = bounds.getSouthWest();
-		var northEast = bounds.getNorthEast();
-		var lngSpan = northEast.lng() - southWest.lng();
-		var latSpan = northEast.lat() - southWest.lat();
-		for (var i = 0; i < 15; i++) {
-		  var point = new GLatLng(southWest.lat() + latSpan * Math.random(), southWest.lng() + lngSpan * Math.random());
-
-		var number = i + 1;
-		  var marker = new GMarker(point);
-		  var message = ["This","is","the","secret","message"];
-		  marker.value = number;
-		  GEvent.addListener(marker, "click", function() {
-			var myHtml = "<b>#" + number + "</b><br/>" + message[number -1];
-			map.openInfoWindowHtml(point, myHtml);
-		  });
-
-		  map.addOverlay(marker);// createMarker(point, i + 1));
+			map.setCenter(point, 11);	// This is the scale variable. This is slightly bigger than city scale.
+			//map.openInfoWindow(map.getCenter(), document.createTextNode("Name: John Doe\n</br>Phone: 650-555-1212</br>"));
+			//map.openInfoWindowHtml(map.getCenter(), "Name: John Doe</br>Phone: 650-555-1212</br>Needs: Evac, Electricity</br>Message: Nobody was hurt");
 		}
-
-        }
     }
 
     </script>
 
+{% endblock head %}
+
+{% block bodyattrib %}
+onload="initialize()" onunload="GUnload()"
+{% endblock bodyattrib %}
 
 
-  <body onload="initialize()" onunload="GUnload()">
-    <div id="map_canvas" style="width: 600px; height: 400px"></div>
-  </body>
-
-
-
-
-
-
-
-		</div>
-
+{% block body %}
+<style>
+	#mapBox { background-color:#f1f2f2; margin-top: 1px; padding: 10px; border-top: 1px solid #ccc; }
+</style>
+<center>
+<div style="width:640px; text-align:left;">
+	{% include "messageInfo.html" %}
+	<div id="mapBox">
+    <div id="map_canvas" style="width: 620px; height: 440px"></div>
 	</div>
-
 </div>
 </center>
 {% endblock body %}

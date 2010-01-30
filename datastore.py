@@ -61,7 +61,6 @@ class Post(db.Model):
   user 	   = db.UserProperty()
   datetime = db.DateTimeProperty(auto_now_add=True)
 
-  # this could maybe be a GeoPtProperty() - i don't know if it matters.
   lat      = db.FloatProperty(default=0.0)
   lon	   = db.FloatProperty(default=0.0)
   positionText = db.StringProperty(default='')
@@ -82,7 +81,7 @@ class Post(db.Model):
     if self.positionText:
       meta += ' at %s' % self.positionText
     if not (self.lat == 0 and self.lon == 0):
-      meta += ' <a href="/post/%s">map</a>' % self.key()
+      meta += ' <a href="/message?unique_id=%s">map</a>' % self.unique_id
     return mark_safe("""
 <div class="widgetItem">
   <a href="/message?unique_id=%s">%s</a>
