@@ -6,7 +6,7 @@ except ImportError:
   def mark_safe(s):
     return s
 
-import re, random, sha
+import re, random
 
 class ImokUser(db.Model):
   account = db.UserProperty()
@@ -67,6 +67,33 @@ class Post(db.Model):
 #    return sha.new(str(random.randrange(1, 99999999))).hexdigest()
     return str('%016x' % random.getrandbits(64))
 
+  hash_regex = re.compile(r'(#\S+)(?:\s?)([^#]*)(?=#?)')
+  ll_regex = re.compile(r'\s*(-?\d+\.\d+),(-?\d+\.\d+)')
+
+  @classmethod
+  def getTags(cls, text):
+    return Post.hash_regex.findall(text)
+
+  def tags(self):
+    return Post.getTags(self.message)
+
+  @classmethod
+  def fromText(cls, text):
+    post = Post(message=text)
+    tags = Post.getTags(text)
+    atText = ''
+    for tup in tags:
+      if tup[0] != '#at':
+        continue
+      m = ll_regex.match(tup[1])
+      if not m:
+        atText += tup[1] + ' '
+      else:
+        post.lat = m.group(1)
+        post.lon = m.group(2)
+    post.positionText = atText
+    return post
+      
   def asWidgetRow(self):
     meta = ''
     meta += self.datetime.strftime('%b %d %H:%M')
@@ -89,7 +116,7 @@ class SmsMessage(db.Model):
                                    default='outgoing')
   status       = db.StringProperty(required=True,
                                    choices=set(['queued', 'sent', 'delivered',
-                                                'processed']),
+                                                'processed', 'lost']),
                                    default="queued")
   create_time  = db.DateTimeProperty(auto_now_add=True)
 

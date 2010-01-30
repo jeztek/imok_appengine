@@ -29,16 +29,23 @@ class IncomingHandler(webapp.RequestHandler):
       self.response.out.write(json.dumps(result))
       return
 
-    message = SmsMessage(phone_number=phone, 
+    sms_message = SmsMessage(phone_number=phone, 
                          message=message, 
                          direction='incoming',
-                         status='queued')
-    message.put()
+                         status='lost')
+    objects = [ sms_message ]
 
-    #post = Post()
-    #post.message = message
-    #post.put()
+    phone_entity = Phone.all().filter('number =', phone).get()
+    if phone_entity:
+      post = Post.fromText(message)
+      post.unique_id = Post.gen_unique_key()
+      post.user = phone_entity.user
+      objects.append(post)
+
+      sms_message.status = 'processed'
 		
+    db.put(objects)
+
     #self.response.out.write(message)
     self.response.out.write(json.dumps({'result': 'ok'}))
 
