@@ -3,11 +3,12 @@ try:
 except ImportError:
   import django.utils.simplejson as json
 
-from datastore import Post, SmsMessage, Phone
+from datastore import Post, SmsMessage, Phone, RegisteredEmail, ImokUser
 
 from google.appengine.ext import webapp
 from google.appengine.ext import db
-from google.appengine.ext.webapp import util
+from google.appengine.ext.webapp import template, util
+from google.appengine.api import mail
 
 import settings as s
 
@@ -42,6 +43,7 @@ class IncomingHandler(webapp.RequestHandler):
     objects = [ sms_message ]
 
     phone_entity = Phone.all().filter('number =', phone).get()
+    post = None
     if phone_entity:
       post = Post.fromText(message)
       post.unique_id = Post.gen_unique_key()
@@ -52,6 +54,31 @@ class IncomingHandler(webapp.RequestHandler):
 		
     db.put(objects)
 
+    if not phone_entity:
+      self.response.out.write(json.dumps({'result': 'ok'}))
+      return
+
+    imok_user = ImokUser.all().filter('account =', phone_entity.user).get()
+    email_query = RegisteredEmail.all().filter('userName =', phone_entity.user).order('emailAddress')
+    addresses = []
+    for email in email_query:
+      addresses.append(email.emailAddress)
+    
+    if addresses:
+      template_data = {
+        'message': post.message,
+        'link': post.permalink(self.request.host_url),
+        'user': imok_user
+        }
+      body = template.render(s.template_path('email.txt'), template_data)
+      mail.send_mail(sender=imok_user.account.email(),
+                     to=imok_user.account.email(),
+                     bcc=addresses,
+                     subject="I'm OK",
+                     body=body)
+      sms_message.status = 'processed'
+      sms_message.put()
+        
     #self.response.out.write(message)
     self.response.out.write(json.dumps({'result': 'ok'}))
 
