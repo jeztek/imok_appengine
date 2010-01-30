@@ -66,6 +66,7 @@ class Post(db.Model):
   lon	   = db.FloatProperty(default=0.0)
   positionText = db.StringProperty(default='')
   message  = db.StringProperty()
+  isOk     = db.BooleanProperty(required=True, default=True)
 
   unique_id = db.StringProperty()
   
@@ -89,8 +90,12 @@ class Post(db.Model):
     post = Post(message=text)
     tags = Post.getTags(text)
 
+    ok = False
+
     atText = ''
     for tup in tags:
+      if tup[0] == '#imok':
+        ok = True
       if tup[0] != '#loc':
         continue
       m = ll_regex.match(tup[1])
@@ -100,6 +105,7 @@ class Post(db.Model):
         post.lat = m.group(1)
         post.lon = m.group(2)
     post.positionText = atText
+    post.isOk = ok
     return post
 
   def permalink(self, host=''):
