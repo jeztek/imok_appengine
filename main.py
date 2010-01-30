@@ -40,7 +40,6 @@ class AboutHandler(RequestHandlerPlus):
 
     self.render('about.html', self.getContext(locals()))
 
-<<<<<<< Temporary merge branch 1
 class MessageHandler(RequestHandlerPlus):
   def get(self):
     if users.get_current_user():
@@ -53,10 +52,7 @@ class MessageHandler(RequestHandlerPlus):
 
     self.render('message.html', self.getContext(locals()))
 
-class CreateProfileHandler(RequestHandlerPlus):
-=======
 class EditProfileHandler(RequestHandlerPlus):
->>>>>>> Temporary merge branch 2
   @login_required
   def get(self):
     user = users.get_current_user()

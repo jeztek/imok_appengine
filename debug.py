@@ -48,8 +48,9 @@ class DebugPostHandler(RequestHandlerPlus):
       self.redirect("/")
 
     p = Post(user=user, message='test message', lat=37., lon=-122.)
+    p.unique_id = Post.gen_unique_key()
     p.put()
-    
+
     registeredEmailQuery = RegisteredEmail.all().filter('userName =', users.get_current_user()).order('emailAddress')
     addresses = []
     for registeredEmail in registeredEmailQuery:

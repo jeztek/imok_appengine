@@ -6,7 +6,7 @@ except ImportError:
   def mark_safe(s):
     return s
 
-import re, random
+import re, random, sha
 
 class ImokUser(db.Model):
   account = db.UserProperty()
@@ -59,6 +59,13 @@ class Post(db.Model):
   lon	   = db.FloatProperty(default=0.0)
   positionText = db.StringProperty(default='')
   message  = db.StringProperty()
+
+  unique_id = db.StringProperty()
+  
+  @classmethod
+  def gen_unique_key(cls):
+#    return sha.new(str(random.randrange(1, 99999999))).hexdigest()
+    return str('%016x' % random.getrandbits(64))
 
   def asWidgetRow(self):
     meta = ''
