@@ -119,3 +119,8 @@ table .messagePost {
 table.profileForm th {
   font-weight: normal;
 }
+
+select {
+    font-size: 18px;
+    padding: 8px;
+}
