@@ -1,17 +1,25 @@
+import re, random, sys
 
+from google.appengine.api import users
 from google.appengine.ext import db
+import pytz
 try:
   from django.utils.safestring import mark_safe
 except ImportError:
   def mark_safe(s):
     return s
 
+
 import re, random
+from timeutils import *
+
+TZ_CHOICES = ['America/Port-au-Prince', 'US/Pacific', 'US/Eastern'] + pytz.common_timezones
 
 class ImokUser(db.Model):
   account = db.UserProperty()
   firstName = db.StringProperty(verbose_name='First name')
   lastName = db.StringProperty(verbose_name='Last name')
+  tz = db.StringProperty(default='US/Pacific', choices=TZ_CHOICES, verbose_name='Preferred time zone')
 
 class Phone(db.Model):
   """
@@ -54,7 +62,6 @@ class Post(db.Model):
   user 	   = db.UserProperty()
   datetime = db.DateTimeProperty(auto_now_add=True)
 
-  # this could maybe be a GeoPtProperty() - i don't know if it matters.
   lat      = db.FloatProperty(default=0.0)
   lon	   = db.FloatProperty(default=0.0)
   positionText = db.StringProperty(default='')
@@ -96,17 +103,19 @@ class Post(db.Model):
       
   def asWidgetRow(self):
     meta = ''
-    meta += self.datetime.strftime('%b %d %H:%M')
+    displayUser = users.get_current_user()
+    localTzName = ImokUser.all().filter('account =', displayUser).fetch(1)[0].tz
+    meta += formatLocalFromUtc(self.datetime, localTzName)
     if self.positionText:
       meta += ' at %s' % self.positionText
     if not (self.lat == 0 and self.lon == 0):
-      meta += ' <a href="/post/%s">map</a>' % self.key()
+      meta += ' <a href="/message?unique_id=%s">map</a>' % self.unique_id
     return mark_safe("""
 <div class="widgetItem">
-  <a href="/post/%s">%s</a>
+  <a href="/message?unique_id=%s">%s</a>
   <span class="meta">%s</span>
 </div>
-""" % (self.key(), self.message, meta))
+""" % (self.unique_id, self.message, meta))
 
 class SmsMessage(db.Model):
   phone_number = db.StringProperty(required=True)

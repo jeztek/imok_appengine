@@ -1,0 +1,11 @@
+<style>
+	#messageInfoBar { margin-top:0px; padding:4px; background-color:#f1f2f2; width:632px; }
+	#theMessage { background-color:#ffffff; border:solid 1px #8e8eae; padding:4px; padding-left:8px; padding-right:8px; }
+</style>
+<div id = "messageInfoBar">
+	This is the sms message:<br/><br/>
+	<b id="theMessage">{{ idMessage.message }}</b><br/><br/>
+	Sent : {{ dateTime }}<br/>
+	From: {{ user.firstName }} {{ user.lastName }}<br/>
+	Email: {{ user.account }}
+</div>

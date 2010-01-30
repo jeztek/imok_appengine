@@ -7,12 +7,18 @@ from google.appengine.ext.webapp.util import login_required
 from google.appengine.api import mail
 
 # must import template before importing django stuff
+import django.core.validators
 from google.appengine.ext.db import djangoforms
 try:
   from django import newforms as forms
 except ImportError:
   from django import forms
 import django.core.exceptions
+try:
+  from django.utils.safestring import mark_safe
+except ImportError:
+  def mark_safe(s):
+    return s
 
 import settings
 from datastore import *
@@ -48,7 +54,13 @@ class MessageHandler(RequestHandlerPlus):
         mustLogIn = "True" # this is so the navigation bar only shows the relevant things.
         login_url = users.create_login_url("/home")
 
-    uniqueID = self.request.get('uniqueID')
+    unique_id = self.request.get('unique_id')
+    idQuery = Post.all().filter('unique_id = ', unique_id)
+    idMessage = idQuery.get()
+    lat = str(idMessage.lat)
+    lon = str(idMessage.lon)
+    dateTime = str(idMessage.datetime)
+    user = ImokUser.all().filter('account = ', idMessage.user).get()
 
     self.render('message.html', self.getContext(locals()))
 
@@ -87,18 +99,22 @@ class HomeHandler(RequestHandlerPlus):
     if not profile:
         self.redirect('/newuser/profile')
 
+    phone = getPhone()
+    if phone and not phone.verified:
+      banner = mark_safe('You must <a href="/phone/verify">finish verifying your phone number</a> before you can post messages.')
+
     # profile widget
     phonesQuery = Phone.all().filter('user = ', user)
     phones = phonesQuery.fetch(1)
 
     # emails widget
     emailsQuery = RegisteredEmail.all().filter('userName = ', user)
-    emails = emailsQuery.fetch(3)
+    emails = emailsQuery.fetch(5)
     numEmailsNotShown = emailsQuery.count() - len(emails)
 
     # recent messages widget
     postsQuery = Post.all().filter('user = ', user).order('-datetime')
-    posts = postsQuery.fetch(2)
+    posts = postsQuery.fetch(10)
     numPosts = postsQuery.count()
     numPostsNotShown = numPosts - len(posts)
     
@@ -119,30 +135,24 @@ class RegisterEmailHandler(RequestHandlerPlus):
   def get(self):
     registeredEmailQuery = RegisteredEmail.all().filter('userName =', users.get_current_user()).order('emailAddress')
     registeredEmailList = registeredEmailQuery.fetch(100)
-    
-    logout_url = users.create_logout_url("/")
-
     self.render('register_email.html', self.getContext(locals()))
 
-class AddRegisteredEmailHandler(RequestHandlerPlus):
   def post(self):
     if users.get_current_user():
       newEmail = RegisteredEmail()
       newEmail.userName = users.get_current_user()
       success = True
+      tempEmailString = self.request.get('emailAddress')
+      newEmail.emailAddress = tempEmailString
       try:
-        # can't not remember to validate email
-        tempEmailString = self.request.get('emailAddress')
-        newEmail.emailAddress = tempEmailString
-        # WHY DOESN'T THIS WORK? I SUCK. do I need a real mail server for this? -OTAVIO
-        if not mail.is_email_valid(tempEmailString):
-          success = False
-      except:
-        success = False
+        django.core.validators.isValidEmail(tempEmailString, None)
+      except django.core.validators.ValidationError:
+        addError = 'Please enter a valid e-mail address.'
       else:
-        if success:
-          newEmail.put()
-    self.redirect(self.request.get('returnAddr'))
+        newEmail.put()
+    registeredEmailQuery = RegisteredEmail.all().filter('userName =', users.get_current_user()).order('emailAddress')
+    registeredEmailList = registeredEmailQuery.fetch(100)
+    self.render('register_email.html', self.getContext(locals()))
 
 class RemoveRegisteredEmailHandler(RequestHandlerPlus):
   def post(self):
@@ -242,7 +252,7 @@ def main():
 
     # must be logged in for these...
     ('/email', RegisterEmailHandler),
-    ('/email/add', AddRegisteredEmailHandler),
+    #('/email/add', AddRegisteredEmailHandler),
     ('/email/remove', RemoveRegisteredEmailHandler),
     ('/phone/verify', VerifyPhoneHandler),
     ('/phone/confirm', ConfirmPhoneHandler),

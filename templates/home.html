@@ -77,10 +77,27 @@ table.profileWidget td {
   color: #777;
 }
 
+.banner {
+  padding-top: 10px;
+  padding-left: 30px;
+}
+
+.banner span {
+  font-weight: bold;
+  font-size: 1.3em;
+  background-color: yellow;
+  padding-left: 10px;  
+  padding-right: 10px;  
+}
+
 </style>
 {% endblock head %}
 
 {% block body %}
+
+{% if banner %}
+<div class="banner"><span>{{ banner }}</span></div>
+{% endif %}
 
 <table class="homeLayout"><tr><td class="homeLayout">
 
@@ -96,6 +113,10 @@ table.profileWidget td {
 <tr>
   <th>Name:</th>
   <td>{{ profile.firstName}} {{profile.lastName }}</td>
+</tr>
+<tr>
+  <th>Preferred time zone:</th>
+  <td>{{ profile.tz }}</td>
 </tr>
 {% for phone in phones %}
 <tr>
