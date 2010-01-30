@@ -34,8 +34,7 @@
           background-color: #ffffff;
           border: solid 1px #8e8eae;
           padding: 0px;
-          padding-left: 8px;
-          padding-right: 8px;
+          padding: 8px;
         }
         table.messageDetail th {
           color: #999999;
@@ -73,7 +72,7 @@ onload="initialize()" onunload="GUnload()"
   {% include "messageInfo.html" %}
   {% if haveLocation %}
   <div id="mapBox">
-    <div class="mapDescription">message sent from this location</div>
+    <div class="mapDescription">message sent from latitude,longitude&nbsp; {{ lat }},{{ lon }}</div>
     <div id="map_canvas"></div>
   </div>
   {% endif %}
