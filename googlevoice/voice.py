@@ -1,9 +1,18 @@
-from conf import config
+
 from util import *
 import settings
 import os
 
-from appengine_util import URLOpener
+try:
+    import json
+except ImportError:
+    try:
+        import simplejson as json
+    except ImportError:
+        import django.utils.simplejson as json
+
+if settings.USE_APPENGINE:
+    from appengine_util import URLOpener
 
 if settings.DEBUG:
     import logging
@@ -20,6 +29,7 @@ class Voice(object):
     """
     def __init__(self):
         self.opener = URLOpener()
+        self._special = None
 
         for name in settings.FEEDS:
             setattr(self, name, self.__get_xml_page(name))
@@ -63,12 +73,12 @@ class Voice(object):
             return self
         
         if email is None:
-            email = config.email
+            email = settings.EMAIL
         if email is None:
             raise NoCredentialsError
         
         if passwd is None:
-            passwd = config.password
+            passwd = settings.PASSWORD
         if passwd is None:
             raise NoCredentialsError
 
@@ -95,6 +105,7 @@ class Voice(object):
         self.__do_page('logout')
         del self._special 
         assert self.special == None
+        self._special = None
         return self
         
     def call(self, outgoingNumber, forwardingNumber=None, phoneType=None, subscriberNumber=None):
@@ -209,6 +220,22 @@ class Voice(object):
         elif data is None:
             data = {'page': "p%d" % page}
         return self.__get_xml_page(feed, data, headers)
+
+    ######################
+    # Marshalling
+    ######################
+
+    def to_json(self):
+        values = {
+            '_special': self._special,
+            'cookies': self.opener.cookie.output(header='')
+            }
+        return json.dumps(values)
+            
+    def from_json(self, json_string):
+        values = json.loads(json_string)
+        self._special = values['_special']
+        self.opener.cookie.load(str(values['cookies']))
 
     ######################
     # Helper methods

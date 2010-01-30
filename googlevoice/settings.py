@@ -1,9 +1,7 @@
-import local_settings
 
-DEFAULT_CONFIG = local_settings.DEFAULT_CONFIG
-
-DEBUG = False
+DEBUG = True
 LOGIN = 'https://www.google.com/accounts/ServiceLoginAuth?service=grandcentral'
+
 FEEDS = ('inbox', 'starred', 'all', 'spam', 'trash', 'voicemail', 'sms',
         'recorded', 'placed', 'received', 'missed')
 
@@ -35,3 +33,13 @@ XML_RECORDED = XML_RECENT + 'recorded/'
 XML_PLACED = XML_RECENT + 'placed/'
 XML_RECEIVED = XML_RECENT + 'received/'
 XML_MISSED = XML_RECENT + 'missed/'
+
+EMAIL = None
+PASSWORD = None
+
+USE_APPENGINE = False
+
+try:
+  from local_settings import *
+except:
+  pass

@@ -49,10 +49,56 @@ class NewUserProfileHandler(RequestHandlerPlus):
 class NewUserVerifyPhoneHandler(RequestHandlerPlus):
   @login_required
   def get(self):
+    phone = getPhone()
+    if not phone:
+      self.redirect('/newuser/profile')
+      return
+
     turnOnSelection2 = "selectedNavItem"
     self.render('newUserVerifyPhone.html', self.getContext(locals()))
 
   def post(self):
+    self.redirect('/newuser/contacts')
+
+class NewUserConfirmPhoneHandler(RequestHandlerPlus):
+  @login_required
+  def get(self):
+    phone = getPhone()
+    if not phone:
+      self.redirect('/newuser/profile')
+      return
+
+    turnOnSelection2 = "selectedNavItem"
+    self.render('newUserConfirmPhone.html', self.getContext(locals()))
+
+  def post(self):
+    if not users.get_current_user():
+      self.redirect('/')
+      return
+
+    phone = getPhone()
+    if not phone:
+      self.redirect('/newuser/profile')
+      return
+
+    errorlist = []
+    code = self.request.get('code', '')
+    if not code:
+      errorlist.append('Must enter a code')
+    elif len(code) != 4:
+      errorlist.append('Code is only 4 digits')
+    elif code != phone.code:
+      errorlist.append('Incorrect code')
+
+    if errorlist:
+      turnOnSelection2 = "selectedNavItem"
+      self.render('newUserConfirmPhone.html', self.getContext(locals()))
+      return
+
+    phone.code = ''
+    phone.verified = True
+    phone.put()
+
     self.redirect('/newuser/contacts')
 
 class NewUserContactsHandler(RequestHandlerPlus):
@@ -74,6 +120,7 @@ def main():
   application = webapp.WSGIApplication([
     ('/newuser/profile', NewUserProfileHandler),
     ('/newuser/verifyPhone', NewUserVerifyPhoneHandler),
+    ('/newuser/confirmPhone', NewUserConfirmPhoneHandler),
     ('/newuser/contacts', NewUserContactsHandler),
     ('/newuser/download', NewUserDownloadHandler),
   ], debug=True)

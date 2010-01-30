@@ -21,8 +21,8 @@ handlers:
   static_dir: static/pdf
   mime_type: application/pdf
 
-- url: /incoming/.*
-  script: incoming.py
+- url: /smsgateway/.*
+  script: smsgateway.py
 
 - url: /tasks/.*
   script: tasks.py

@@ -25,7 +25,6 @@ class Phone(db.Model):
   number = db.StringProperty()       # Phone number
   verified = db.BooleanProperty(default=False)    # Whether they have verified it or not
   code = db.StringProperty(default='')         # Verification code
-  code_time = db.DateTimeProperty()
 
   @classmethod
   def is_valid_number(cls, number):
@@ -76,7 +75,14 @@ class Post(db.Model):
 """ % (self.key(), self.message, meta))
 
 class SmsMessage(db.Model):
-  sha_hash     = db.StringProperty(required=True)
-  received     = db.DateTimeProperty()
-  phone_number = db.StringProperty()
-  message      = db.StringProperty()
+  phone_number = db.StringProperty(required=True)
+  message      = db.StringProperty(required=True)
+  direction    = db.StringProperty(required=True, 
+                                   choices=set(['incoming', 'outgoing']), 
+                                   default='outgoing')
+  status       = db.StringProperty(required=True,
+                                   choices=set(['queued', 'sent', 'delivered',
+                                                'processed']),
+                                   default="queued")
+  create_time  = db.DateTimeProperty(auto_now_add=True)
+

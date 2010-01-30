@@ -1,12 +1,27 @@
 
 import Cookie
-import urllib
+
 from google.appengine.api import urlfetch
 
 import logging
 logging.basicConfig()
 log = logging.getLogger('URLOpener')
 log.setLevel(logging.DEBUG)
+
+class ResponseWrapper(object):
+  def __init__(self, response):
+    self.response = response
+
+  def content(self):
+    return self.response.content
+  content = property(content)
+
+  def read(self):
+    return self.response.content
+
+  def headers(self):
+    return self.response.headers
+  headers = property(headers)
 
 class URLOpener:
   def __init__(self):
@@ -18,11 +33,11 @@ class URLOpener:
     else:
       method = urlfetch.POST
 
+    num_fetches = 1
+
     while url is not None:
       the_headers = self._getHeaders(self.cookie)
       the_headers.update(headers)
-
-      log.debug("Fetching: url=" + url + " headers=" + str(the_headers))
       
       response = urlfetch.fetch(url=url,
                                 payload=data,
@@ -33,12 +48,14 @@ class URLOpener:
                                 deadline=10
                                 )
 
-      data = None # Next request will be a get, so no need to send the data again. 
+      num_fetches += 1
+      data = None 
       method = urlfetch.GET
-      self.cookie.load(response.headers.get('set-cookie', '')) # Load the cookies from the response
+      self.cookie.load(response.headers.get('set-cookie', ''))
       url = response.headers.get('location')
     
-    return response
+    log.debug("Number fetches: %d" % num_fetches)
+    return ResponseWrapper(response)
         
   def _getHeaders(self, cookie):
     headers = {
