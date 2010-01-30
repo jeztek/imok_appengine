@@ -64,8 +64,8 @@ class Post(db.Model):
 
   lat      = db.FloatProperty(default=0.0)
   lon	   = db.FloatProperty(default=0.0)
-  positionText = db.StringProperty(default='')
-  message  = db.StringProperty()
+  positionText = db.StringProperty(default='', multiline=True)
+  message  = db.StringProperty(multiline=True)
   isOk     = db.BooleanProperty(required=True, default=True)
 
   unique_id = db.StringProperty()
@@ -99,11 +99,11 @@ class Post(db.Model):
       if tup[0] != '#loc':
         continue
       m = ll_regex.match(tup[1])
-      if not m:
-        atText += tup[1] + ' '
-      else:
+      if m:
         post.lat = m.group(1)
         post.lon = m.group(2)
+      else:
+        atText += tup[1] + ' '
     post.positionText = atText
     post.isOk = ok
     return post
@@ -129,7 +129,7 @@ class Post(db.Model):
 
 class SmsMessage(db.Model):
   phone_number = db.StringProperty(required=True)
-  message      = db.StringProperty(required=True)
+  message      = db.StringProperty(required=True, multiline=True)
   direction    = db.StringProperty(required=True, 
                                    choices=set(['incoming', 'outgoing']), 
                                    default='outgoing')
