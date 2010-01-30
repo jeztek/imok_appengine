@@ -88,9 +88,10 @@ class Post(db.Model):
   def fromText(cls, text):
     post = Post(message=text)
     tags = Post.getTags(text)
+
     atText = ''
     for tup in tags:
-      if tup[0] != '#at':
+      if tup[0] != '#loc':
         continue
       m = ll_regex.match(tup[1])
       if not m:
