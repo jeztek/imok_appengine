@@ -12,7 +12,7 @@ def formatLocalFromUtc(utcDt, localTzName):
     localTz = timezone(localTzName)
     localNow = localFromUtc(datetime.datetime.utcnow(), localTz)
     localDt = localFromUtc(utcDt, localTz)
-    timeFmt = '%l:%M %p %z'
+    timeFmt = '%I:%M %p %z'
     if localDt.toordinal() == localNow.toordinal():
         # if today, leave off date
         return '%s' % localDt.strftime(timeFmt)
