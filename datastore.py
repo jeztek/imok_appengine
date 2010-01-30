@@ -25,7 +25,6 @@ class Phone(db.Model):
   number = db.StringProperty()       # Phone number
   verified = db.BooleanProperty(default=False)    # Whether they have verified it or not
   code = db.StringProperty(default='')         # Verification code
-  code_time = db.DateTimeProperty()
 
   @classmethod
   def is_valid_number(cls, number):
@@ -61,27 +60,29 @@ class Post(db.Model):
   positionText = db.StringProperty(default='')
   message  = db.StringProperty()
 
-  def asTableRow(self):
-    timeStr = self.datetime.strftime('%b %d %H:%M')
-    posList = []
+  def asWidgetRow(self):
+    meta = ''
+    meta += self.datetime.strftime('%b %d %H:%M')
     if self.positionText:
-      posList.append(self.positionText)
-    if not self.lat == 0 and self.lon == 0:
-      posList.append('Lat/lon: %f, %f' % (self.lat, self.lon))
-    if posList:
-      posStr = '<br/>'.join(posList)
-    else:
-      posStr = '(none)'
+      meta += ' at %s' % self.positionText
+    if not (self.lat == 0 and self.lon == 0):
+      meta += ' <a href="/post/%s">map</a>' % self.key()
     return mark_safe("""
-<tr>
-  <td class="messagePost">%s</td>
-  <td class="messagePost">%s</td>
-  <td class="messagePost">%s</td>
-</tr>
-""" % (timeStr, posStr, self.message))
+<div class="widgetItem">
+  <a href="/post/%s">%s</a>
+  <span class="meta">%s</span>
+</div>
+""" % (self.key(), self.message, meta))
 
 class SmsMessage(db.Model):
-  sha_hash     = db.StringProperty(required=True)
-  received     = db.DateTimeProperty()
-  phone_number = db.StringProperty()
-  message      = db.StringProperty()
+  phone_number = db.StringProperty(required=True)
+  message      = db.StringProperty(required=True)
+  direction    = db.StringProperty(required=True, 
+                                   choices=set(['incoming', 'outgoing']), 
+                                   default='outgoing')
+  status       = db.StringProperty(required=True,
+                                   choices=set(['queued', 'sent', 'delivered',
+                                                'processed']),
+                                   default="queued")
+  create_time  = db.DateTimeProperty(auto_now_add=True)
+

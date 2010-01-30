@@ -1,4 +1,4 @@
-import os, datetime
+import os, datetime, sys
 
 from google.appengine.api import users
 from google.appengine.ext import webapp
@@ -23,25 +23,23 @@ class NewUserProfileHandler(RequestHandlerPlus):
   @login_required
   def get(self):
     user = users.get_current_user()
-    username = user.nickname()
-    logout_url = users.create_logout_url("/")
     profile = getProfile(True)
-    form = UserProfileForm(instance=profile)
+    phone = getPhone()
+    if phone:
+      initial = dict(phoneNumber=phone.number_str())
+    else:
+      initial = None
+    form = UserProfileForm(instance=profile, initial=initial)
     turnOnSelection1 = "selectedNavItem"
     self.render('newUserProfile.html', self.getContext(locals()))
 
   def post(self):
     user = users.get_current_user()
-    username = user.nickname()
-    logout_url = users.create_logout_url("/")
     profile = getProfile(True)
     form = UserProfileForm(data=self.request.POST, instance=profile)
     if form.is_valid():
       # Save the data and redirect to home
-      editedProfile = form.save(commit=False)
-      editedProfile.put()
-      defaultPhone = Phone(user=user, number=form._cleaned_data()['phone'])
-      defaultPhone.put()
+      form.saveWithPhone()
       self.redirect('/newuser/verifyPhone')
     else:
       # Reprint the form
@@ -51,10 +49,56 @@ class NewUserProfileHandler(RequestHandlerPlus):
 class NewUserVerifyPhoneHandler(RequestHandlerPlus):
   @login_required
   def get(self):
+    phone = getPhone()
+    if not phone:
+      self.redirect('/newuser/profile')
+      return
+
     turnOnSelection2 = "selectedNavItem"
     self.render('newUserVerifyPhone.html', self.getContext(locals()))
 
   def post(self):
+    self.redirect('/newuser/contacts')
+
+class NewUserConfirmPhoneHandler(RequestHandlerPlus):
+  @login_required
+  def get(self):
+    phone = getPhone()
+    if not phone:
+      self.redirect('/newuser/profile')
+      return
+
+    turnOnSelection2 = "selectedNavItem"
+    self.render('newUserConfirmPhone.html', self.getContext(locals()))
+
+  def post(self):
+    if not users.get_current_user():
+      self.redirect('/')
+      return
+
+    phone = getPhone()
+    if not phone:
+      self.redirect('/newuser/profile')
+      return
+
+    errorlist = []
+    code = self.request.get('code', '')
+    if not code:
+      errorlist.append('Must enter a code')
+    elif len(code) != 4:
+      errorlist.append('Code is only 4 digits')
+    elif code != phone.code:
+      errorlist.append('Incorrect code')
+
+    if errorlist:
+      turnOnSelection2 = "selectedNavItem"
+      self.render('newUserConfirmPhone.html', self.getContext(locals()))
+      return
+
+    phone.code = ''
+    phone.verified = True
+    phone.put()
+
     self.redirect('/newuser/contacts')
 
 class NewUserContactsHandler(RequestHandlerPlus):
@@ -76,6 +120,7 @@ def main():
   application = webapp.WSGIApplication([
     ('/newuser/profile', NewUserProfileHandler),
     ('/newuser/verifyPhone', NewUserVerifyPhoneHandler),
+    ('/newuser/confirmPhone', NewUserConfirmPhoneHandler),
     ('/newuser/contacts', NewUserContactsHandler),
     ('/newuser/download', NewUserDownloadHandler),
   ], debug=True)

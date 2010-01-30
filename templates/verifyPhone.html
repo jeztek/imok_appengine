@@ -3,8 +3,6 @@
 {% block body %}
 <center>
 <div style="width:500px; text-align:left;">
-	{% include "newUserNav.html" %}
-
 	<style>
 	.removeLink{background-color:transparent; padding: 0px; border-width: 0; font-size: 0.7em; border-color:transparent; cursor: pointer; text-decoration:underline; color:#0000FF; }
 
@@ -31,14 +29,11 @@
 			     <input type="submit" name="verify"
                                     value="Send Code"">
                              <input type="hidden" name="continue"
-                                    value="/newuser/confirmPhone">
-                             &nbsp;<a href="/newuser/contacts">Skip</a>
+                                    value="/phone/confirm">
+                             &nbsp;<a href="/home">Skip</a>
 		         </div>
                          </form>
                         </div>
-             
-		</div>
-		</div>
 
 	</div>
 

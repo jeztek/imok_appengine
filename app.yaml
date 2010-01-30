@@ -21,11 +21,8 @@ handlers:
   static_dir: static/pdf
   mime_type: application/pdf
 
-- url: /incoming/.*
-  script: incoming.py
-
-- url: /phone/.*
-  script: phone.py
+- url: /smsgateway/.*
+  script: smsgateway.py
 
 - url: /tasks/.*
   script: tasks.py
@@ -33,6 +30,9 @@ handlers:
 
 - url: /newuser/.*
   script: newuser.py
+
+- url: /debug.*
+  script: debug.py
 
 - url: .*
   script: main.py
