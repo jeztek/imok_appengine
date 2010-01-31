@@ -162,6 +162,30 @@ class RemoveRegisteredEmailHandler(RequestHandlerPlus):
         
     self.redirect(self.request.get('returnAddr'))
 
+def deleteUserObjects(table, user, field='user'):
+  results = table.all().filter('%s = ' % field, user).fetch(1000)
+  db.delete(results)
+
+class DeleteProfileHandler(RequestHandlerPlus):
+  @login_required
+  def get(self):
+    self.render('deleteProfile.html', self.getContext(locals()))
+
+  def post(self):
+    user = users.get_current_user()
+    if not user:
+      self.redirect('/')
+
+    deleteUserObjects(ImokUser, user, field='account')
+    deleteUserObjects(Phone, user)
+    deleteUserObjects(RegisteredEmail, user, field='userName')
+    deleteUserObjects(Post, user)
+
+    self.redirect(users.create_logout_url("/profile/deleted"))
+
+class DeletedProfileHandler(RequestHandlerPlus):
+  def get(self):
+    self.render('deletedProfile.html', self.getContext(locals()))
 
 class DownloadsHandler(RequestHandlerPlus):
   @login_required
@@ -253,6 +277,8 @@ def main():
     ('/phone/verify', VerifyPhoneHandler),
     ('/phone/confirm', ConfirmPhoneHandler),
     ('/profile/edit', EditProfileHandler),
+    ('/profile/delete', DeleteProfileHandler),
+    ('/profile/deleted', DeletedProfileHandler),
     ('/download', DownloadsHandler),
                                         
   ], debug=True)
