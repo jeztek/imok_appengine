@@ -28,9 +28,11 @@
         {% else %}
         <li> <a href="/home">Home</a></li>
         <li> <a href="/about">About</a></li>
+	  {% if not newUser %}
         <li> <a href="/profile/edit">Profile</a></li>
         <li> <a href="/email">Contacts</a></li>
         <li> <a href="/download">Download Mobile App</a></li>
+	  {% endif %}
         <li> <a href="{{ logout_url }}">Log out</a></li>
         {% endif %}
 

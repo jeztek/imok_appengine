@@ -22,6 +22,7 @@ from imokforms import *
 class NewUserProfileHandler(RequestHandlerPlus):
   @login_required
   def get(self):
+    newUser = True # hide some header links
     user = users.get_current_user()
     profile = getProfile(True)
     phone = getPhone()
@@ -49,6 +50,7 @@ class NewUserProfileHandler(RequestHandlerPlus):
 class NewUserVerifyPhoneHandler(RequestHandlerPlus):
   @login_required
   def get(self):
+    newUser = True # hide some header links
     phone = getPhone()
     if not phone:
       self.redirect('/newuser/profile')
@@ -63,6 +65,7 @@ class NewUserVerifyPhoneHandler(RequestHandlerPlus):
 class NewUserConfirmPhoneHandler(RequestHandlerPlus):
   @login_required
   def get(self):
+    newUser = True # hide some header links
     phone = getPhone()
     if not phone:
       self.redirect('/newuser/profile')
@@ -104,6 +107,7 @@ class NewUserConfirmPhoneHandler(RequestHandlerPlus):
 class NewUserContactsHandler(RequestHandlerPlus):
   @login_required
   def get(self):
+    newUser = True # hide some header links
     registeredEmailQuery = RegisteredEmail.all().filter('userName =', users.get_current_user()).filter('blocked =', False).order('emailAddress')
     registeredEmailList = registeredEmailQuery.fetch(100)
     turnOnSelection3 = "selectedNavItem"
@@ -130,6 +134,7 @@ class NewUserContactsHandler(RequestHandlerPlus):
 class NewUserDownloadHandler(RequestHandlerPlus):
   @login_required
   def get(self):
+    newUser = True # hide some header links
     turnOnSelection4 = "selectedNavItem"
     self.render('newUserDownload.html', self.getContext(locals()))
 
