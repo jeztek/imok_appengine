@@ -3,15 +3,15 @@ RIM-COD-Module-Name: IMOk
 RIM-COD-Module-Dependencies: net_rim_cldc
 MIDlet-Jar-Size: 34754
 MIDlet-1: IMOk,,
-RIM-COD-Creation-Time: 1264914612
+RIM-COD-Creation-Time: 1264915385
 MIDlet-Jar-URL: IMOk.jar
 RIM-COD-URL: IMOk.cod
-RIM-COD-SHA1: b1 a4 39 e1 78 29 db aa 12 c8 fe 8c dd d5 f0 d8 98 ad 3d c5
+RIM-COD-SHA1: 9b 79 f7 e3 3d 6a 46 86 43 55 26 1b bc 90 9a 9e 88 40 b7 6c
 RIM-COD-Size: 12568
 MicroEdition-Configuration: CLDC-1.1
-MIDlet-Version: 1.0.2
+MIDlet-Version: 1.0.3
 MIDlet-Name: IMOk
 MIDlet-Description: Notify your friends and family in the event of an emergency.
-MIDlet-Vendor: <unknown>
+MIDlet-Vendor: IMOk
 MicroEdition-Profile: MIDP-2.0
 RIM-MIDlet-Flags-1: 0
