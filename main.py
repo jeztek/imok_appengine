@@ -140,7 +140,7 @@ class GetInvolvedHandler(RequestHandlerPlus):
 class RegisterEmailHandler(RequestHandlerPlus):
   @login_required
   def get(self):
-    registeredEmailQuery = RegisteredEmail.all().filter('userName =', users.get_current_user()).order('emailAddress')
+    registeredEmailQuery = RegisteredEmail.all().filter('userName =', users.get_current_user()).filter('blocked =', False).order('emailAddress')
     registeredEmailList = registeredEmailQuery.fetch(100)
     self.render('registerEmail.html', self.getContext(locals()))
 
@@ -150,11 +150,15 @@ class RegisterEmailHandler(RequestHandlerPlus):
     emailString = self.request.get('emailAddress')
     emailError = getEmailErrorIfAny(emailString)
     if not emailError:
+      if RegisteredEmail.all().filter('userName =', users.get_current_user()).filter('emailAddress =', emailString).count() > 0:
+        emailError = 'Email address already registered or unsubscribed.'
+
+    if not emailError:
       newEmail = RegisteredEmail(userName=users.get_current_user(),
                                  emailAddress=emailString,
                                  uniqueId=RegisteredEmail.gen_unique_key())
       newEmail.put()
-    registeredEmailQuery = RegisteredEmail.all().filter('userName =', users.get_current_user()).order('emailAddress')
+    registeredEmailQuery = RegisteredEmail.all().filter('userName =', users.get_current_user()).filter('blocked =', False).order('emailAddress')
     registeredEmailList = registeredEmailQuery.fetch(100)
     self.render('registerEmail.html', self.getContext(locals()))
 
@@ -183,9 +187,8 @@ class UnsubscribeHandler(RequestHandlerPlus):
 
     user = ImokUser.all().filter('account =', email.userName).get()
 
-    blocked = BlockedEmail(emailAddress=email.emailAddress)
-    blocked.put()
-    email.delete()
+    email.blocked = True
+    email.put()
 
     self.render('unsubscribe.html', {'email': email.emailAddress, 'user': user})
 
