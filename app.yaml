@@ -31,6 +31,9 @@ handlers:
   mime_type: application/vnd.rim.cod
   upload: static/blackberry/IMOk.cod
 
+- url: /bb.*
+  script: blackberry.py
+
 - url: /smsgateway/.*
   script: smsgateway.py
 
