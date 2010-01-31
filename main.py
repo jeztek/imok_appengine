@@ -57,7 +57,8 @@ class MessageHandler(RequestHandlerPlus):
     idMessage = idQuery.get()
     lat = str(idMessage.lat)
     lon = str(idMessage.lon)
-    dateTime = formatLocalFromUtc(idMessage.datetime, getProfile().tz)
+    profile = ImokUser.all().filter('account =', idMessage.user).fetch(1)[0]
+    dateTime = formatLocalFromUtc(idMessage.datetime, profile.tz)
     user = ImokUser.all().filter('account = ', idMessage.user).get()
     key = settings.MAPS_KEY
 
