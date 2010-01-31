@@ -33,6 +33,11 @@ handlers:
 
 - url: /debug.*
   script: debug.py
+  login: admin
+
+- url: /export.*
+  script: export.py
+  login: admin
 
 - url: .*
   script: main.py
