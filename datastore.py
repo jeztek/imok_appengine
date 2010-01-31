@@ -98,7 +98,7 @@ class Post(db.Model):
         ok = True
       if tup[0] != '#loc':
         continue
-      m = ll_regex.match(tup[1])
+      m = Post.ll_regex.match(tup[1])
       if m:
         post.lat = m.group(1)
         post.lon = m.group(2)
