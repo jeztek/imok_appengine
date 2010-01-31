@@ -137,7 +137,7 @@ class RegisterEmailHandler(RequestHandlerPlus):
   def get(self):
     registeredEmailQuery = RegisteredEmail.all().filter('userName =', users.get_current_user()).order('emailAddress')
     registeredEmailList = registeredEmailQuery.fetch(100)
-    self.render('register_email.html', self.getContext(locals()))
+    self.render('registerEmail.html', self.getContext(locals()))
 
   def post(self):
     if not users.get_current_user():
@@ -150,7 +150,7 @@ class RegisterEmailHandler(RequestHandlerPlus):
       newEmail.put()
     registeredEmailQuery = RegisteredEmail.all().filter('userName =', users.get_current_user()).order('emailAddress')
     registeredEmailList = registeredEmailQuery.fetch(100)
-    self.render('register_email.html', self.getContext(locals()))
+    self.render('registerEmail.html', self.getContext(locals()))
 
 class RemoveRegisteredEmailHandler(RequestHandlerPlus):
   def post(self):
