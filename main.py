@@ -27,11 +27,10 @@ from imokforms import *
 class IntroHandler(RequestHandlerPlus):
   def get(self):
     if users.get_current_user():
-        logout_url = users.create_logout_url("/")
+      self.redirect('/home')
     else:
-        mustLogIn = "True" # this is so the navigation bar only shows the relevant things.
-        login_url = users.create_login_url("/home")
-        #loginOutUrl = users.create_login_url(self.request.uri)
+      mustLogIn = "True" # this is so the navigation bar only shows the relevant things.
+      login_url = users.create_login_url("/home")
 
     self.render('intro.html', self.getContext(locals()))
 
