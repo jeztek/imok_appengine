@@ -68,6 +68,7 @@ class RegisteredEmail(db.Model):
   userName = db.UserProperty()       # Who this email belongs to
   emailAddress = db.EmailProperty()  # The email address
   uniqueId = db.StringProperty()
+  blocked = db.BooleanProperty(default=False)
 
   @classmethod
   def gen_unique_key(cls):
@@ -76,9 +77,6 @@ class RegisteredEmail(db.Model):
 
   def permalink(self, host=''):
     return "%s/unsubscribe?id=%s" % (host, self.uniqueId)
-
-class BlockedEmail(db.Model):
-  emailAddress = db.EmailProperty(required=True)
 
 class Post(db.Model):
   user 	   = db.UserProperty()

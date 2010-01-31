@@ -104,7 +104,7 @@ class NewUserConfirmPhoneHandler(RequestHandlerPlus):
 class NewUserContactsHandler(RequestHandlerPlus):
   @login_required
   def get(self):
-    registeredEmailQuery = RegisteredEmail.all().filter('userName =', users.get_current_user()).order('emailAddress')
+    registeredEmailQuery = RegisteredEmail.all().filter('userName =', users.get_current_user()).filter('blocked =', False).order('emailAddress')
     registeredEmailList = registeredEmailQuery.fetch(100)
     turnOnSelection3 = "selectedNavItem"
     self.render('newUserContacts.html', self.getContext(locals()))
@@ -115,11 +115,14 @@ class NewUserContactsHandler(RequestHandlerPlus):
     emailString = self.request.get('emailAddress')
     emailError = getEmailErrorIfAny(emailString)
     if not emailError:
+      if RegisteredEmail.all().filter('userName =', users.get_current_user()).filter('emailAddress =', emailString).count() > 0:
+        emailError = 'Email address already registered or unsubscribed.'
+    if not emailError:
       newEmail = RegisteredEmail(userName=users.get_current_user(),
                                  emailAddress=emailString,
                                  uniqueId=RegisteredEmail.gen_unique_key())
       newEmail.put()
-    registeredEmailQuery = RegisteredEmail.all().filter('userName =', users.get_current_user()).order('emailAddress')
+    registeredEmailQuery = RegisteredEmail.all().filter('userName =', users.get_current_user()).filter('blocked =', False).order('emailAddress')
     registeredEmailList = registeredEmailQuery.fetch(100)
     turnOnSelection3 = "selectedNavItem"
     self.render('newUserContacts.html', self.getContext(locals()))
