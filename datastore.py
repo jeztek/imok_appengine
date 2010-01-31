@@ -21,6 +21,12 @@ class ImokUser(db.Model):
   lastName = db.StringProperty(verbose_name='Last name')
   tz = db.StringProperty(default='America/Port-au-Prince', choices=TZ_CHOICES, verbose_name='Time zone')
 
+  def getShortName(self):
+    if self.firstName:
+      return '%s. %s' % (self.firstName[0], self.lastName)
+    else:
+      return self.lastName
+
 class Phone(db.Model):
   """
   A registered phone number.
@@ -84,6 +90,9 @@ class Post(db.Model):
 
   def tags(self):
     return Post.getTags(self.message)
+
+  def hasLocation(self):
+    return not (self.lat == 0.0 and self.lon == 0.0)
 
   @classmethod
   def fromText(cls, text):

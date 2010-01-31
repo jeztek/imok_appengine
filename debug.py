@@ -41,6 +41,7 @@ class ResetDbHandler(RequestHandlerPlus):
 
 class DebugPostHandler(RequestHandlerPlus):
   def post(self):
+    user = users.get_current_user()
     okUser = ImokUser.all().filter('account =', user).get()
     
     p = Post(user=user, message='test message', lat=37., lon=-122.)
