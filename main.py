@@ -55,6 +55,12 @@ class MessageHandler(RequestHandlerPlus):
     unique_id = self.request.get('unique_id')
     idQuery = Post.all().filter('unique_id = ', unique_id)
     post = idQuery.get()
+
+    if not post:
+      self.error(404)
+      self.render('404Error.html', {})
+      return
+
     lat = str(post.lat)
     lon = str(post.lon)
     profile = ImokUser.all().filter('account =', post.user).get()
