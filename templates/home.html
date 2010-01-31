@@ -36,17 +36,17 @@ table.messagePost td {
   padding-right: 5px;
 }
 
-table.profileWidget {
+table.widgetTable {
 }
 
-table.profileWidget th {
+table.widgetTable th {
   text-align: left;
-  padding-left: 5px;
+  padding-left: 0px;
   padding-right: 5px;
   font-weight: normal;
 }
 
-table.profileWidget td {
+table.widgetTable td {
   text-align: left;
   padding-left: 5px;
   padding-right: 5px;
@@ -63,7 +63,7 @@ table.profileWidget td {
   font-size: 1.2em;
   padding: 5px 0px;
 }
-.widgetAction{
+.widgetAction {
   margin-top: 5px;
   float: right;
   font-size: 0.8em;
@@ -113,7 +113,7 @@ table.profileWidget td {
 </div>
 
 <p>
-<table class="profileWidget">
+<table class="widgetTable">
 <tr>
   <th>Name:</th>
   <td>{{ profile.firstName}} {{profile.lastName }}</td>
@@ -144,9 +144,7 @@ table.profileWidget td {
   </div>
 </div>
 
-<p>When you post an <i>I'm OK!</i> message, these people will
-be notified by e-mail.</p>
-
+<p>The following people will be notified when you post a message:</p>
 <p>
 {% if emails %}
   {% for email in emails %}
@@ -163,6 +161,30 @@ be notified by e-mail.</p>
 
 </td>
 <td class="homeLayout">
+
+<div class="widget">
+<div class="widgetTitle">Info</div>
+<p>
+<table class="widgetTable">
+  <tr><th>SMS gateway:<th><td>{{ sms_gateway }}</td></tr>
+</table>
+</p>
+<p>
+To post a status message, you can <a href="/download">download</a> a mobile app
+or send a text message from your mobile phone to the SMS gateway number above.  
+</p>
+<p>
+The text message should contain a status message followed by either "#imok" or "#needhelp".
+It can also optionally contain a location "#loc &lt;location text&gt;".
+</p>
+<p>Examples:</p>
+<p>
+  <ul>
+    <li><tt>Need water. #needhelp #loc -133.7898,77.2353</tt></li>
+    <li><tt>Earthquake! Am safe. #imok #loc at home</tt></li>
+  </ul>
+</p>
+</div>
 
 <div class="widget">
 <div class="widgetTitle">Recent messages you sent

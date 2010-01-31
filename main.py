@@ -113,6 +113,9 @@ class HomeHandler(RequestHandlerPlus):
     emails = emailsQuery.fetch(5)
     numEmailsNotShown = emailsQuery.count() - len(emails)
 
+    # info widget
+    sms_gateway = settings.SMS_GATEWAY
+
     # recent messages widget
     postsQuery = Post.all().filter('user = ', user).order('-datetime')
     posts = postsQuery.fetch(10)
