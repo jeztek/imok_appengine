@@ -100,8 +100,8 @@ class Post(db.Model):
         continue
       m = Post.ll_regex.match(tup[1])
       if m:
-        post.lat = m.group(1)
-        post.lon = m.group(2)
+        post.lat = float(m.group(1))
+        post.lon = float(m.group(2))
       else:
         atText += tup[1] + ' '
     post.positionText = atText
