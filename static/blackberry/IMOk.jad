@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+RIM-COD-Module-Name: IMOk
+RIM-COD-Module-Dependencies: net_rim_cldc
+MIDlet-Jar-Size: 34151
+MIDlet-1: IMOk,,
+RIM-COD-Creation-Time: 1264903070
+MIDlet-Jar-URL: IMOk.jar
+RIM-COD-URL: IMOk.cod
+RIM-COD-SHA1: df d4 8c 55 86 79 b9 d5 c9 ee 98 b6 63 b1 85 89 ee 68 eb d2
+RIM-COD-Size: 12176
+MicroEdition-Configuration: CLDC-1.1
+MIDlet-Version: 1.0.2
+MIDlet-Name: IMOk
+MIDlet-Vendor: <unknown>
+MicroEdition-Profile: MIDP-2.0
+RIM-MIDlet-Flags-1: 0

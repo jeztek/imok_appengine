@@ -21,6 +21,16 @@ handlers:
   static_dir: static/pdf
   mime_type: application/pdf
 
+- url: /static/blackberry/IMOk.jad
+  static_files: static/blackberry/IMOk.jad
+  mime_type: text/vnd.sun.j2me.app-descriptor
+  upload: static/blackberry/IMOk.jad
+
+- url: /static/blackberry/IMOk.cod
+  static_files: static/blackberry/IMOk.cod
+  mime_type: application/vnd.rim.cod
+  upload: static/blackberry/IMOk.cod
+
 - url: /smsgateway/.*
   script: smsgateway.py
 
