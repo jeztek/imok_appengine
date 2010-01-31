@@ -59,7 +59,7 @@ class DebugPostHandler(RequestHandlerPlus):
         'unsubscribe_link': registeredEmail.permalink(self.request.host_url)
         }
       emailBody = template.render(settings.template_path('email.txt'), templateData)
-      mail.send_mail(sender='imok.mailer@gmail.com',
+      mail.send_mail(sender=settings.MAILER_EMAIL,
                      to=registeredEmail.emailAddress,
                      subject="I'm OK",
                      body=emailBody)

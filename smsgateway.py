@@ -70,15 +70,15 @@ class IncomingHandler(webapp.RequestHandler):
         'user': imok_user
         }
       body = template.render(s.template_path('email.txt'), template_data)
-      mail.send_mail(sender='imok.mailer@gmail.com',
+      mail.send_mail(sender=s.MAILER_EMAIL,
                      to=email.emailAddress,
-                     subject="I'm OK",
+                     subject="IMOk status",
                      body=body)
 
     sms_message.status = 'processed'
 
     response_sms = SmsMessage(phone_number=phone,
-                              message="I'm OK: Message received. %d contact(s) notified." % email_query.count(),
+                              message="IMOk: Message received, %d contact(s) notified." % email_query.count(),
                               direction="outgoing",
                               status="queued")
 

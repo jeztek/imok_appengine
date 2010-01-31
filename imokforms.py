@@ -30,7 +30,7 @@ class PhoneField(forms.CharField):
 
     clean_number = Phone.normalize_number(value)
     if Phone.all().filter('verified =', True).filter('number =', clean_number).filter('user !=', user).count() > 0:
-      raise forms.ValidationError('Phone number taken. Please enter a different one.')
+      raise forms.ValidationError('Phone number taken, please enter a different one.')
 
     return clean_number
 
@@ -44,7 +44,7 @@ class PhoneField(forms.CharField):
     
 
 class UserProfileForm(djangoforms.ModelForm):
-  phoneNumber = PhoneField(label="Phone number*")
+  phoneNumber = PhoneField(label="Mobile phone number*")
 
   def saveWithPhone(self):
     editedProfile = self.save(commit=False)

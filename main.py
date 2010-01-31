@@ -124,7 +124,7 @@ class HomeHandler(RequestHandlerPlus):
     
     phone = getPhone()
     if phone and not phone.verified:
-      banner = mark_safe('You must <a href="/phone/verify">finish verifying your phone number</a> before you can post messages.')
+      banner = mark_safe('You must <a href="/phone/verify">verify your phone number</a> before you can post messages.')
     elif not emails:
       banner = mark_safe('You must <a href="/email">add e-mail contacts</a> or no one will get your messages.')
 

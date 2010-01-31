@@ -1,41 +1,41 @@
 <style type="text/css">
-        /* keep CSS embedded so we can include it in KML */
-	.messageInfoBar {
-          margin-top: 0px;
-          padding: 10px;
-          width: 100%;
-          text-align: left;
-        }
-	.theMessage {
-          font-weight: bold;
-          background-color: #ffffff;
-          border: solid 1px #8e8eae;
-          padding: 0px;
-          padding: 8px;
-        }
-        table.messageDetail th {
-          color: #999999;
-          text-align: right;
-          padding-right: 10px;
-        }
+  /* keep CSS embedded so we can include it in KML */
+  .messageInfoBar {
+  margin-top: 0px;
+  padding: 10px;
+  width: 100%;
+  text-align: left;
+  }
+  .theMessage {
+  font-weight: bold;
+  background-color: #ffffff;
+  border: solid 1px #8e8eae;
+  padding: 0px;
+  padding: 8px;
+  }
+  table.messageDetail th {
+  color: #999999;
+  text-align: right;
+  padding-right: 10px;
+  }
 </style>
 <div class="messageInfoBar">
-        <table class="messageDetail">
-	  <tr>
-            <th>sent</th>
-            <td>{{ dateTime }}</td>
-          </tr>
-	  <tr>
-            <th>from</th>
-            <td>{{ profile.firstName }} {{ profile.lastName }} &#60;{{ profile.account }}&#62;</td>
-          </tr>
-          {% if post.positionText %}
-	  <tr>
-            <th>location</th>
-            <td>{{ post.positionText }}</td>
-          </tr>
-          {% endif %}
-        </table>
-        <br/>
-	<div class="theMessage">{{ post.message }}</div>
+  <table class="messageDetail">
+    <tr>
+      <th>sent</th>
+      <td>{{ dateTime }}</td>
+    </tr>
+    <tr>
+      <th>from</th>
+      <td>{{ profile.firstName }} {{ profile.lastName }} &#60;{{ profile.account }}&#62;</td>
+    </tr>
+    {% if post.positionText %}
+    <tr>
+      <th>location</th>
+      <td>{{ post.positionText }}</td>
+    </tr>
+    {% endif %}
+  </table>
+  <br/>
+  <div class="theMessage">{{ post.message }}</div>
 </div>

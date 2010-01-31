@@ -2,29 +2,32 @@
 
 {% block body %}
 <center>
-<div style="width:500px; text-align:left;">
-	<style>
-	.removeLink{background-color:transparent; padding: 0px; border-width: 0; font-size: 0.7em; border-color:transparent; cursor: pointer; text-decoration:underline; color:#0000FF; }
+  <div style="width:500px; text-align:left;">
+    <style>
+      .removeLink{background-color:transparent; padding: 0px; border-width: 0; font-size: 0.7em; border-color:transparent; cursor: pointer; text-decoration:underline; color:#0000FF; }
+    </style>
 
-	</style>
-	<div id="wizardContent">
+    <div id="wizardContent">
+      <div>
+	<b>Edit Profile Information</b><br/><br/>
 
-		<div>
-			<b>Edit Profile Information</b><br/>
+	<form method="post" action="/profile/edit">
+          <table class="profileForm">
+	    {{ form }}
+          </table>
+	  <p>
+	    <span style="font-size: 0.8em;">
+	      * Must be a valid 10-digit US number
+	    </span>
+	  </p>
+	  <div class="nextButton">
+	    <input type="submit" value="Save">
+	    <a style="padding-left:10px" href="/home">Cancel</a>
+	  </div>
+	</form>
+      </div>
+    </div>
 
-			<form method="post" action="/profile/edit">
-                        <table class="profileForm">
-			{{ form }}
-                        </table>
-<p>* Number of your phone that you will use to send <i>I'm OK!</i> text messages.
-Must be a 10-digit US phone number.</p>
-			<div class="nextButton">
-				<input type="submit" value="Save"><a style="padding-left:10px" href="/home">Cancel</a>
-			</div>
-			</form>
-		</div>
-	</div>
-
-</div>
+  </div>
 </center>
 {% endblock body %}

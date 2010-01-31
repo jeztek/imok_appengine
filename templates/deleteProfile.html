@@ -2,17 +2,20 @@
 
 {% block body %}
 
-<center><div style="width: 678px; text-align: left;">
+<center>
+<div style="width: 678px; text-align: left;">
 
-<p><div style="font-size: 1.2em">Permanently delete your account?</div></p>
+  <p>
+    <div style="font-size: 1.2em">Permanently delete your account?</div>
+  </p>
 
-<p>
-<form action="/profile/delete" method="post">
-  <input style="text-align: right;" type="submit" value="Delete"/>
-  <a href="/home">Cancel</a>
-</form>
-</p>
-
-</div></center>
+  <p>
+    <form action="/profile/delete" method="post">
+      <input style="text-align: right;" type="submit" value="Delete"/>
+      <a href="/home">Cancel</a>
+    </form>
+  </p>
+</div>
+</center>
 
 {% endblock body %}

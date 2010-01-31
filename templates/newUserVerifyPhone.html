@@ -2,46 +2,38 @@
 
 {% block body %}
 <center>
-<div style="width:500px; text-align:left;">
-	{% include "newUserNav.html" %}
+  <div style="width:500px; text-align:left;">
+    {% include "newUserNav.html" %}
+    <style>
+      .removeLink{background-color:transparent; padding: 0px; border-width: 0; font-size: 0.7em; border-color:transparent; cursor: pointer; text-decoration:underline; color:#0000FF; }
+    </style>
 
-	<style>
-	.removeLink{background-color:transparent; padding: 0px; border-width: 0; font-size: 0.7em; border-color:transparent; cursor: pointer; text-decoration:underline; color:#0000FF; }
+    <div id="wizardContent">
+      <div>
+	<b>Verify Phone</b><br/><br/>
+	<span style="font-size: 0.8em;">
+	  Your mobile phone must be verified before it can be used.
+	  Press "Next" to proceed.  A 4-digit code will be sent to 
+	  {{ phone.number_str }} within a few minutes.
+	  <br/><br/>
+          You may skip this for now, but you <i>must</i> complete this step
+	  before you can use your phone with this service.
+        </span><br/><br/>
 
-	</style>
-	<div id="wizardContent">
-
-		<div>
-			<b>Verify Phone</b><br/>
-			<span style="font-size: 0.8em;">
-                        To use this phone, it first must be verified.
-			To start this process, press the "Send
-			Code".  A 4-digit code will
-                        be sent to {{phone.number_str}}.<br/>
-                        <br/>
-                        You may skip this for
-			now, but you <i>must</i> complete this step
-			before you can use the phone with this
-			service.
-                        </span><br/><br/>
-
-                        <div class="nextButton">
-                         <form action="/phone/verify" method="post">
-		         <div>
-			     <input type="submit" name="verify"
-                                    value="Send Code"">
-                             <input type="hidden" name="continue"
-                                    value="/newuser/confirmPhone">
-                            <a style="padding-left:10px" href="/newuser/contacts">Skip</a>
-		         </div>
-                         </form>
-                        </div>
-             
-		</div>
-		</div>
-
-	</div>
-
+        <div class="nextButton">
+          <form action="/phone/verify" method="post">
+	    <div>
+	      <input type="submit" name="verify"
+                     value="Next">
+	      <input type="hidden" name="continue"
+		     value="/newuser/confirmPhone">
+	      <a style="padding-left:10px" href="/newuser/contacts">Skip</a>
+	    </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 </center>
 {% endblock body %}

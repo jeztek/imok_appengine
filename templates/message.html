@@ -1,45 +1,45 @@
 {% extends "base.html" %}
 
 {% block head %}
-    {% if post.hasLocation %}
-    <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key={{ key }}&sensor=false"
-            type="text/javascript"></script>
-    <script type="text/javascript">
-    function initialize() {
-		if (GBrowserIsCompatible()) {
-			var map = new GMap2(document.getElementById("map_canvas"));
-			var point = new GLatLng({{lat}},{{lon}});//37.77493,-122.419416);
-			map.setCenter(point, 12);
-			map.setUIToDefault();
+{% if post.hasLocation %}
+<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key={{ key }}&sensor=false"
+        type="text/javascript"></script>
+<script type="text/javascript">
+  function initialize() {
+    if (GBrowserIsCompatible()) {
+      var map = new GMap2(document.getElementById("map_canvas"));
+      var point = new GLatLng({{lat}},{{lon}});//37.77493,-122.419416);
+      map.setCenter(point, 12);
+      map.setUIToDefault();
 
-			map.addOverlay(new GMarker(point));
+      map.addOverlay(new GMarker(point));
 
-			map.setCenter(point, 11);	// This is the scale variable. This is slightly bigger than city scale.
-			//map.openInfoWindow(map.getCenter(), document.createTextNode("Name: John Doe\n</br>Phone: 650-555-1212</br>"));
-			//map.openInfoWindowHtml(map.getCenter(), "Name: John Doe</br>Phone: 650-555-1212</br>Needs: Evac, Electricity</br>Message: Nobody was hurt");
-		}
+      map.setCenter(point, 11);	// This is the scale variable. This is slightly bigger than city scale.
+      //map.openInfoWindow(map.getCenter(), document.createTextNode("Name: John Doe\n</br>Phone: 650-555-1212</br>"));
+      //map.openInfoWindowHtml(map.getCenter(), "Name: John Doe</br>Phone: 650-555-1212</br>Needs: Evac, Electricity</br>Message: Nobody was hurt");
     }
+  }
+</script>
+{% endif %}
 
-    </script>
-    {% endif %}
 <style type="text/css">
-	#mapBox {
-          margin-top: 1px;
-          padding: 10px;
-          width: 100%;
-        }
-        #map_canvas {
-          width: 100%;
-          height: 440px;
-        }
-        .messageBigBox {
-          width: 640px;
-          padding: 10px;
-        }
-        .mapDescription {
-          color: #999999;
-          font-weight: bold;
-        }
+  #mapBox {
+  margin-top: 1px;
+  padding: 10px;
+  width: 100%;
+  }
+  #map_canvas {
+  width: 100%;
+  height: 440px;
+  }
+  .messageBigBox {
+  width: 640px;
+  padding: 10px;
+  }
+  .mapDescription {
+  color: #999999;
+  font-weight: bold;
+  }
 </style>
 
 {% endblock head %}
@@ -51,14 +51,14 @@ onload="initialize()" onunload="GUnload()"
 
 {% block body %}
 <center>
-<div class="messageBigBox">
-  {% include "messageInfo.html" %}
-  {% if post.hasLocation %}
-  <div id="mapBox">
-    <div class="mapDescription">message sent from latitude,longitude&nbsp; {{ lat }},{{ lon }}</div>
-    <div id="map_canvas"></div>
+  <div class="messageBigBox">
+    {% include "messageInfo.html" %}
+    {% if post.hasLocation %}
+    <div id="mapBox">
+      <div class="mapDescription">message sent from latitude,longitude&nbsp; {{ lat }},{{ lon }}</div>
+      <div id="map_canvas"></div>
+    </div>
+    {% endif %}
   </div>
-  {% endif %}
-</div>
 </center>
 {% endblock body %}

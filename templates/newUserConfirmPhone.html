@@ -2,51 +2,47 @@
 
 {% block body %}
 <center>
-<div style="width:500px; text-align:left;">
-	{% include "newUserNav.html" %}
+  <div style="width:500px; text-align:left;">
+    {% include "newUserNav.html" %}
+    
+    <style>
+      .removeLink{background-color:transparent; padding: 0px; border-width: 0; font-size: 0.7em; border-color:transparent; cursor: pointer; text-decoration:underline; color:#0000FF; }
+    </style>
 
-	<style>
-	.removeLink{background-color:transparent; padding: 0px; border-width: 0; font-size: 0.7em; border-color:transparent; cursor: pointer; text-decoration:underline; color:#0000FF; }
+    <div id="wizardContent">
+      <div>
+	<b>Verify Phone</b><br/><br/>
+	<span style="font-size: 0.8em;">
+          Your phone should receive a SMS message containing a 4-digit code 
+	  within a few minutes. Please enter this code into the box below.
+        </span><br/><br/>
 
-	</style>
-	<div id="wizardContent">
-
-		<div>
-			<b>Verify Phone</b><br/>
-			<span style="font-size: 0.8em;">
-                        You should receive a 4-digit code in an SMS
-			message.  Please type this code into the text
-			box below.
-                        </span><br/><br/>
-
-			<form method="post" action="/newuser/confirmPhone"> 
-                        <table class="profileForm"> 
-			<tr>
-                          <th><label for="id_code">Code:</label></th>
-                          <td>
-                            {% if errorlist %}
-                            <ul class="errorlist">
-                              {% for error in errorlist %}
-                              <li>{{ error }}</li>
-                              {% endfor %}
-                            </ul>
-                            {% endif %}
-                            <input type="text" name="code"
-                                   value="{{ code }}" id="id_code" size="6"
-                                   maxlength="5" />
-                          </td>
-                        </tr> 
-                        <tr>
-                        </table> 
-			<div class="nextButton"> 
-				<input  type="submit" value="Confirm">
-                                <a style="padding-left:10px" href="/newuser/contacts">Skip</a>
-			</div> 
-			</form> 
-		</div>
-
-	</div>
-
+	<form method="post" action="/newuser/confirmPhone"> 
+          <table class="profileForm"> 
+	    <tr>
+              <th><label for="id_code">Code:</label></th>
+              <td>
+                {% if errorlist %}
+                <ul class="errorlist">
+                  {% for error in errorlist %}
+                  <li>{{ error }}</li>
+                  {% endfor %}
+                </ul>
+                {% endif %}
+                <input type="text" name="code"
+                       value="{{ code }}" id="id_code" size="6"
+                       maxlength="5" />
+              </td>
+            </tr> 
+            <tr>
+          </table> 
+	  <div class="nextButton"> 
+	    <input  type="submit" value="Next">
+            <a style="padding-left:10px" href="/newuser/contacts">Skip</a>
+	  </div> 
+	</form> 
+      </div>
+    </div>
 </div>
 </center>
 {% endblock body %}

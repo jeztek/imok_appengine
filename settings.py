@@ -6,6 +6,8 @@ MAPS_KEY = 'ABQIAAAAAFc3F2oO92IOeSdh20OvwRTIaxK6J1v0NBsI6tB269QU6Hg_LRSrbrOnRs7N
 
 SMS_GATEWAY = '555-555-5555'
 
+MAILER_EMAIL = 'imok.mailer@gmail.com'
+
 def template_path(template_file):
   return os.path.join(TEMPLATE_DIR, template_file)
 
