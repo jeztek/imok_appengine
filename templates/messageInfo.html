@@ -1,3 +1,23 @@
+<style type="text/css">
+        /* keep CSS embedded so we can include it in KML */
+	.messageInfoBar {
+          margin-top: 0px;
+          padding: 10px;
+          width: 100%;
+          text-align: left;
+        }
+	.theMessage {
+          font-weight: bold;
+          background-color: #ffffff;
+          border: solid 1px #8e8eae;
+          padding: 0px;
+          padding: 8px;
+        }
+        table.messageDetail th {
+          color: #999999;
+          text-align: right;
+        }
+</style>
 <div class="messageInfoBar">
         <table class="messageDetail">
 	  <tr>
@@ -6,15 +26,15 @@
           </tr>
 	  <tr>
             <th>from</th>
-            <td>{{ user.firstName }} {{ user.lastName }} &lt;{{ user.account }}&gt;</td>
+            <td>{{ profile.firstName }} {{ profile.lastName }} &#60;{{ profile.account }}&#62;</td>
           </tr>
-          {% if idMessage.positionText %}
+          {% if post.positionText %}
 	  <tr>
             <th>location</th>
-            <td>{{ idMessage.positionText }}</td>
+            <td>{{ post.positionText }}</td>
           </tr>
           {% endif %}
         </table>
         <br/>
-	<div class="theMessage">{{ idMessage.message }}</div>
+	<div class="theMessage">{{ post.message }}</div>
 </div>
