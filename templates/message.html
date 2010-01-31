@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block head %}
-    {% if haveLocation %}
+    {% if post.hasLocation %}
     <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key={{ key }}&sensor=false"
             type="text/javascript"></script>
     <script type="text/javascript">
@@ -23,24 +23,6 @@
     </script>
     {% endif %}
 <style type="text/css">
-	.messageInfoBar {
-          margin-top: 0px;
-          padding: 10px;
-          width: 100%;
-          text-align: left;
-        }
-	.theMessage {
-          font-weight: bold;
-          background-color: #ffffff;
-          border: solid 1px #8e8eae;
-          padding: 0px;
-          padding-left: 8px;
-          padding-right: 8px;
-        }
-        table.messageDetail th {
-          color: #999999;
-          text-align: right;
-        }
 	#mapBox {
           margin-top: 1px;
           padding: 10px;
@@ -71,9 +53,9 @@ onload="initialize()" onunload="GUnload()"
 <center>
 <div class="messageBigBox">
   {% include "messageInfo.html" %}
-  {% if haveLocation %}
+  {% if post.hasLocation %}
   <div id="mapBox">
-    <div class="mapDescription">message sent from this location</div>
+    <div class="mapDescription">message sent from latitude,longitude&nbsp; {{ lat }},{{ lon }}</div>
     <div id="map_canvas"></div>
   </div>
   {% endif %}

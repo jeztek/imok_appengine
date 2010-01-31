@@ -24,31 +24,26 @@ class DebugHandler(RequestHandlerPlus):
   def get(self):
     self.render('debug.html', self.getContext(locals()))
 
-def deleteAll(query):
+def deleteAll(table):
+  query = table.all()
   count = query.count()
   results = query.fetch(count)
   db.delete(results)
 
 class ResetDbHandler(RequestHandlerPlus):
   def post(self):
-    if users.is_current_user_admin():
-      deleteAll(ImokUser.all())
-      deleteAll(Phone.all())
-      deleteAll(RegisteredEmail.all())
-      deleteAll(Post.all())
-      self.render('resetdb.html', self.getContext(locals()))
-    else:
-      self.error(403)
-      self.response.out.write('403 Forbidden')
+    deleteAll(ImokUser)
+    deleteAll(Phone)
+    deleteAll(RegisteredEmail)
+    deleteAll(Post)
+    deleteAll(SmsMessage)
+    self.render('resetdb.html', self.getContext(locals()))
 
 class DebugPostHandler(RequestHandlerPlus):
   def post(self):
     user = users.get_current_user()
-    if not user:
-      self.redirect("/")
-
     okUser = ImokUser.all().filter('account =', user).get()
-
+    
     p = Post(user=user, message='test message', lat=37., lon=-122.)
     p.unique_id = Post.gen_unique_key()
     p.put()
@@ -85,7 +80,6 @@ def main():
                                         
   ], debug=True)
   util.run_wsgi_app(application)
-
 
 if __name__ == '__main__':
   main()

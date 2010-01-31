@@ -48,8 +48,11 @@ class RequestHandlerPlus(webapp.RequestHandler):
       return context
 
   def render(self, tmplName, tmplValues, contentType='text/html'):
+    self.writeResponse(template.render(settings.template_path(tmplName), tmplValues))
+
+  def writeResponse(self, text, contentType='text/html'):
     self.response.headers['Content-Type'] = contentType
-    self.response.out.write(template.render(settings.template_path(tmplName), tmplValues))
+    self.response.out.write(text)
 
 def getEmailErrorIfAny(email):
   try:

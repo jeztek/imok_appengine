@@ -27,11 +27,10 @@ from imokforms import *
 class IntroHandler(RequestHandlerPlus):
   def get(self):
     if users.get_current_user():
-        logout_url = users.create_logout_url("/")
+      self.redirect('/home')
     else:
-        mustLogIn = "True" # this is so the navigation bar only shows the relevant things.
-        login_url = users.create_login_url("/home")
-        #loginOutUrl = users.create_login_url(self.request.uri)
+      mustLogIn = "True" # this is so the navigation bar only shows the relevant things.
+      login_url = users.create_login_url("/home")
 
     self.render('intro.html', self.getContext(locals()))
 
@@ -55,12 +54,11 @@ class MessageHandler(RequestHandlerPlus):
 
     unique_id = self.request.get('unique_id')
     idQuery = Post.all().filter('unique_id = ', unique_id)
-    idMessage = idQuery.get()
-    lat = str(idMessage.lat)
-    lon = str(idMessage.lon)
-    haveLocation = not (lat == 0.0 and lon == 0.0)
-    dateTime = formatLocalFromUtc(idMessage.datetime, getProfile().tz)
-    user = ImokUser.all().filter('account = ', idMessage.user).get()
+    post = idQuery.get()
+    lat = str(post.lat)
+    lon = str(post.lon)
+    profile = ImokUser.all().filter('account =', post.user).get()
+    dateTime = formatLocalFromUtc(post.datetime, profile.tz)
     key = settings.MAPS_KEY
 
     self.render('message.html', self.getContext(locals()))
@@ -138,7 +136,7 @@ class RegisterEmailHandler(RequestHandlerPlus):
   def get(self):
     registeredEmailQuery = RegisteredEmail.all().filter('userName =', users.get_current_user()).order('emailAddress')
     registeredEmailList = registeredEmailQuery.fetch(100)
-    self.render('register_email.html', self.getContext(locals()))
+    self.render('registerEmail.html', self.getContext(locals()))
 
   def post(self):
     if not users.get_current_user():
@@ -152,7 +150,7 @@ class RegisterEmailHandler(RequestHandlerPlus):
       newEmail.put()
     registeredEmailQuery = RegisteredEmail.all().filter('userName =', users.get_current_user()).order('emailAddress')
     registeredEmailList = registeredEmailQuery.fetch(100)
-    self.render('register_email.html', self.getContext(locals()))
+    self.render('registerEmail.html', self.getContext(locals()))
 
 class RemoveRegisteredEmailHandler(RequestHandlerPlus):
   def post(self):
@@ -184,6 +182,31 @@ class UnsubscribeHandler(RequestHandlerPlus):
     email.delete()
 
     self.render('unsubscribe.html', {'email': email.emailAddress, 'user': user})
+
+def deleteUserObjects(table, user, field='user'):
+  results = table.all().filter('%s = ' % field, user).fetch(1000)
+  db.delete(results)
+
+class DeleteProfileHandler(RequestHandlerPlus):
+  @login_required
+  def get(self):
+    self.render('deleteProfile.html', self.getContext(locals()))
+
+  def post(self):
+    user = users.get_current_user()
+    if not user:
+      self.redirect('/')
+
+    deleteUserObjects(ImokUser, user, field='account')
+    deleteUserObjects(Phone, user)
+    deleteUserObjects(RegisteredEmail, user, field='userName')
+    deleteUserObjects(Post, user)
+
+    self.redirect(users.create_logout_url("/profile/deleted"))
+
+class DeletedProfileHandler(RequestHandlerPlus):
+  def get(self):
+    self.render('deletedProfile.html', self.getContext(locals()))
 
 class DownloadsHandler(RequestHandlerPlus):
   @login_required
@@ -276,6 +299,8 @@ def main():
     ('/phone/verify', VerifyPhoneHandler),
     ('/phone/confirm', ConfirmPhoneHandler),
     ('/profile/edit', EditProfileHandler),
+    ('/profile/delete', DeleteProfileHandler),
+    ('/profile/deleted', DeletedProfileHandler),
     ('/download', DownloadsHandler),
                                         
   ], debug=True)

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+<center><div style="width: 678px; text-align: left;">
+
+<div style="font-size: 1.3em">Permanently delete your <i>I'm OK!</i> account?</div>
+
+<p>
+<form action="/profile/delete" method="post">
+  <input style="text-align: right;" type="submit" value="Delete"/>
+  <a href="/home">Cancel</a>
+</form>
+</p>
+
+</div></center>
+
+{% endblock body %}
