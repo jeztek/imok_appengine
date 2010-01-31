@@ -54,12 +54,11 @@ class MessageHandler(RequestHandlerPlus):
 
     unique_id = self.request.get('unique_id')
     idQuery = Post.all().filter('unique_id = ', unique_id)
-    idMessage = idQuery.get()
-    lat = str(idMessage.lat)
-    lon = str(idMessage.lon)
-    profile = ImokUser.all().filter('account =', idMessage.user).fetch(1)[0]
-    dateTime = formatLocalFromUtc(idMessage.datetime, profile.tz)
-    user = ImokUser.all().filter('account = ', idMessage.user).get()
+    post = idQuery.get()
+    lat = str(post.lat)
+    lon = str(post.lon)
+    profile = ImokUser.all().filter('account =', post.user).get()
+    dateTime = formatLocalFromUtc(post.datetime, profile.tz)
     key = settings.MAPS_KEY
 
     self.render('message.html', self.getContext(locals()))
