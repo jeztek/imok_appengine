@@ -26,8 +26,10 @@ class PhoneField(forms.CharField):
     if not Phone.is_valid_number(value):
       raise forms.ValidationError('Please enter a valid 10-digit US phone number')
   
+    user = users.get_current_user()
+
     clean_number = Phone.normalize_number(value)
-    if Phone.all().filter('verified =', True).filter('number =', clean_number).count() > 0:
+    if Phone.all().filter('verified =', True).filter('number =', clean_number).filter('user !=', user).count() > 0:
       raise forms.ValidationError('Phone number taken. Please enter a different one.')
 
     return clean_number
