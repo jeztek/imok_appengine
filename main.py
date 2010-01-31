@@ -147,7 +147,8 @@ class RegisterEmailHandler(RequestHandlerPlus):
     emailError = getEmailErrorIfAny(emailString)
     if not emailError:
       newEmail = RegisteredEmail(userName=users.get_current_user(),
-                                 emailAddress=emailString)
+                                 emailAddress=emailString,
+                                 uniqueId=RegisteredEmail.gen_unique_key())
       newEmail.put()
     registeredEmailQuery = RegisteredEmail.all().filter('userName =', users.get_current_user()).order('emailAddress')
     registeredEmailList = registeredEmailQuery.fetch(100)
@@ -164,6 +165,25 @@ class RemoveRegisteredEmailHandler(RequestHandlerPlus):
         
     self.redirect(self.request.get('returnAddr'))
 
+class UnsubscribeHandler(RequestHandlerPlus):
+  def get(self):
+    emailId = self.request.get('id', '')
+    if not emailId:
+      self.redirect('/')
+      return
+
+    email = RegisteredEmail.all().filter('uniqueId =', emailId).get()
+    if not email:
+      self.render('404Error.html', {})
+      return
+
+    user = ImokUser.all().filter('account =', email.userName).get()
+
+    blocked = BlockedEmail(emailAddress=email.emailAddress)
+    blocked.put()
+    email.delete()
+
+    self.render('unsubscribe.html', {'email': email.emailAddress, 'user': user})
 
 class DownloadsHandler(RequestHandlerPlus):
   @login_required
@@ -247,6 +267,7 @@ def main():
     ('/home', HomeHandler),
     ('/about', AboutHandler),
     ('/message', MessageHandler),
+    ('/unsubscribe', UnsubscribeHandler),
     ('/getInvolved', GetInvolvedHandler),
 
     # must be logged in for these...

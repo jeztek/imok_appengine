@@ -5,9 +5,11 @@ except ImportError:
 
 from datastore import Post, SmsMessage, Phone, RegisteredEmail, ImokUser
 
+from google.appengine.api import users
 from google.appengine.ext import webapp
 from google.appengine.ext import db
 from google.appengine.ext.webapp import template, util
+from google.appengine.ext.webapp.util import login_required
 from google.appengine.api import mail
 
 import settings as s
@@ -59,26 +61,24 @@ class IncomingHandler(webapp.RequestHandler):
 
     imok_user = ImokUser.all().filter('account =', phone_entity.user).get()
     email_query = RegisteredEmail.all().filter('userName =', phone_entity.user).order('emailAddress')
-    addresses = []
+
     for email in email_query:
-      addresses.append(email.emailAddress)
-    
-    if addresses:
       template_data = {
         'message': post.message,
         'link': post.permalink(self.request.host_url),
+        'unsubscribe_link': email.permalink(self.request.host_url),
         'user': imok_user
         }
       body = template.render(s.template_path('email.txt'), template_data)
-      mail.send_mail(sender=imok_user.account.email(),
-                     to=imok_user.account.email(),
-                     bcc=addresses,
+      mail.send_mail(sender='imok.mailer@gmail.com',
+                     to=email.emailAddress,
                      subject="I'm OK",
                      body=body)
 
     sms_message.status = 'processed'
+
     response_sms = SmsMessage(phone_number=phone,
-                              message="I'm OK: Message received. %d contact(s) notified." % len(addresses),
+                              message="I'm OK: Message received. %d contact(s) notified." % email_query.count(),
                               direction="outgoing",
                               status="queued")
 
@@ -120,10 +120,20 @@ class OutgoingHandler(webapp.RequestHandler):
     self.response.headers['Content-Type'] = 'text/json'
     self.response.out.write(json.dumps({'result': 'ok', 'messages': send_messages}))
 
+class StatusHandler(webapp.RequestHandler):
+  @login_required
+  def get(self):
+    user = users.get_current_user()
+    if not user.is_current_user_admin():
+      self.redirect('/home')
+    
+    
+
 def main():
   application = webapp.WSGIApplication([
     ('/smsgateway/incoming', IncomingHandler),
     ('/smsgateway/outgoing', OutgoingHandler),
+    #('/smsgateway/status', StatusHandler),
   ], debug=True)
   util.run_wsgi_app(application)
 

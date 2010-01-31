@@ -54,26 +54,25 @@ class DebugPostHandler(RequestHandlerPlus):
     p.put()
 
     registeredEmailQuery = RegisteredEmail.all().filter('userName =', users.get_current_user()).order('emailAddress')
-    addresses = []
+    
+    debug_output = []
     for registeredEmail in registeredEmailQuery:
-      addresses.append(registeredEmail.emailAddress)
-      
-
-    templateData = {
-      'message': p.message,
-      'link': p.permalink(self.request.host_url),
-      'user': okUser
-      }
-    emailBody = template.render(settings.template_path('email.txt'), templateData)
-
-    if (len(addresses) > 0):
-      mail.send_mail(sender=users.get_current_user().email(),
-                     to=users.get_current_user().email(),
-                     bcc=addresses,
+      templateData = {
+        'message': p.message,
+        'link': p.permalink(self.request.host_url),
+        'user': okUser,
+        'unsubscribe_link': registeredEmail.permalink(self.request.host_url)
+        }
+      emailBody = template.render(settings.template_path('email.txt'), templateData)
+      mail.send_mail(sender='imok.mailer@gmail.com',
+                     to=registeredEmail.emailAddress,
                      subject="I'm OK",
                      body=emailBody)
+      debug_output.append(emailBody)
+
+    if debug_output:
       self.response.headers['Content-Type'] = 'text/plain'
-      self.response.out.write(emailBody)
+      self.response.out.write("\n\n".join(debug_output))
       return
     
     self.redirect('/home')

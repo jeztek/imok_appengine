@@ -116,7 +116,8 @@ class NewUserContactsHandler(RequestHandlerPlus):
     emailError = getEmailErrorIfAny(emailString)
     if not emailError:
       newEmail = RegisteredEmail(userName=users.get_current_user(),
-                                 emailAddress=emailString)
+                                 emailAddress=emailString,
+                                 uniqueId=RegisteredEmail.gen_unique_key())
       newEmail.put()
     registeredEmailQuery = RegisteredEmail.all().filter('userName =', users.get_current_user()).order('emailAddress')
     registeredEmailList = registeredEmailQuery.fetch(100)
