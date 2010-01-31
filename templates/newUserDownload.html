@@ -2,27 +2,46 @@
 
 {% block body %}
 <center>
-<div style="width:500px; text-align:left;">
-	{% include "newUserNav.html" %}
+  <div style="width:500px; text-align:left;">
+    {% include "newUserNav.html" %}
+    <style>
+      .removeLink{background-color:transparent; padding: 0px; border-width: 0; font-size: 0.7em; border-color:transparent; cursor: pointer; text-decoration:underline; color:#0000FF; }
+    </style>
 
-	<style>
-	.removeLink{background-color:transparent; padding: 0px; border-width: 0; font-size: 0.7em; border-color:transparent; cursor: pointer; text-decoration:underline; color:#0000FF; }
+    <div id="wizardContent">
+      <div>
+	<b>Download IMOk for Blackberry Bold</b>
+	<br/>
+	<ol>
+	  <li>On your BlackBerry, open a web browser and point it to: 
+	    <p>
+	      <tt style="font-size: 1.2em; padding-left: 30px;">
+		http://imokapp.appengine.com/bb
+	      </tt>
+	    </p>
+	  </li>
+	  <li>Click "Download."
+	    <p style="padding-left: 30px"><img src="/static/img/bb_dl.png" /></p>
+	  </li>
+	  <li><p>You'll find the app in the "Downloads" folder. Click on the "IMOk" icon to start.</p></li>
+	  <li>
+	    <p>
+	      Click "Yes" to grant IMOk Trusted Application status.
+	      This lets IMOk send SMS messages and you'll only see this prompt once.
+	    </p>
+	    <p style="padding-left: 30px"><img src="/static/img/bb_trust.png" /></p>
+	  </li>
+	  <li>
+	    <p>Start the app again and you're ready to go!</p>
+	    <p style="padding-left: 30px"><img src="/static/img/bb_main.png" /></p>
+	  </li>
+	</ol>
 
-	</style>
-	<div id="wizardContent">
-
-		<div>
-			<b>Download App</b><br/>
-			<span style="font-size: 0.8em;">Download the phone client apps</span><br/><br/>
-
-		<a href=/static/blackberry/IMOk.jad>Click here to download the BlackBerry application</a>
-		<div class="nextButton">
-			<input type="submit" value="Finish" onclick="document.location = '/home';">
-		</div>
-		</div>
-
+	<div class="nextButton">
+	  <input type="submit" value="Finish" onclick="document.location = '/home';" />
 	</div>
-
-</div>
+      </div>
+    </div>
+  </div>
 </center>
 {% endblock body %}
