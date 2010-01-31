@@ -24,31 +24,25 @@ class DebugHandler(RequestHandlerPlus):
   def get(self):
     self.render('debug.html', self.getContext(locals()))
 
-def deleteAll(query):
+def deleteAll(table):
+  query = table.all()
   count = query.count()
   results = query.fetch(count)
   db.delete(results)
 
 class ResetDbHandler(RequestHandlerPlus):
   def post(self):
-    if users.is_current_user_admin():
-      deleteAll(ImokUser.all())
-      deleteAll(Phone.all())
-      deleteAll(RegisteredEmail.all())
-      deleteAll(Post.all())
-      self.render('resetdb.html', self.getContext(locals()))
-    else:
-      self.error(403)
-      self.response.out.write('403 Forbidden')
+    deleteAll(ImokUser)
+    deleteAll(Phone)
+    deleteAll(RegisteredEmail)
+    deleteAll(Post)
+    deleteAll(SmsMessage)
+    self.render('resetdb.html', self.getContext(locals()))
 
 class DebugPostHandler(RequestHandlerPlus):
   def post(self):
-    user = users.get_current_user()
-    if not user:
-      self.redirect("/")
-
     okUser = ImokUser.all().filter('account =', user).get()
-
+    
     p = Post(user=user, message='test message', lat=37., lon=-122.)
     p.unique_id = Post.gen_unique_key()
     p.put()
@@ -63,7 +57,7 @@ class DebugPostHandler(RequestHandlerPlus):
       'message': p.message,
       'link': p.permalink(self.request.host_url),
       'user': okUser
-      }
+    }
     emailBody = template.render(settings.template_path('email.txt'), templateData)
 
     if (len(addresses) > 0):
@@ -74,9 +68,8 @@ class DebugPostHandler(RequestHandlerPlus):
                      body=emailBody)
       self.response.headers['Content-Type'] = 'text/plain'
       self.response.out.write(emailBody)
-      return
-    
-    self.redirect('/home')
+    else:
+      self.redirect('/home')
     
 def main():
   application = webapp.WSGIApplication([
@@ -86,7 +79,6 @@ def main():
                                         
   ], debug=True)
   util.run_wsgi_app(application)
-
 
 if __name__ == '__main__':
   main()
