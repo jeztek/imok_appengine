@@ -23,13 +23,23 @@ class PhoneField(forms.CharField):
     super(PhoneField, self).__init__(*args, **kwargs)
 
   def clean(self, value):
-    cleanNumber = re.sub(r'\D+', '', value) # ignore punctuation
-    if len(cleanNumber) == 10:
-      return "+1%s" % cleanNumber
-    elif len(cleanNumber) == 11 and cleanNumber.startswith('1'):
-      return "+%s" % cleanNumber
-    else:
+    if not Phone.is_valid_number(value):
       raise forms.ValidationError('Please enter a valid 10-digit US phone number')
+  
+    clean_number = Phone.normalize_number(value)
+    if Phone.all().filter('verified =', True).filter('number =', clean_number).count() > 0:
+      raise forms.ValidationError('Phone number taken. Please enter a different one.')
+
+    return clean_number
+
+#    cleanNumber = re.sub(r'\D+', '', value) # ignore punctuation
+#    if len(cleanNumber) == 10:
+#      return "+1%s" % cleanNumber
+#    elif len(cleanNumber) == 11 and cleanNumber.startswith('1'):
+#      return "+%s" % cleanNumber
+#    else:
+#      raise forms.ValidationError('Please enter a valid 10-digit US phone number')
+    
 
 class UserProfileForm(djangoforms.ModelForm):
   phoneNumber = PhoneField(label="Phone number*")

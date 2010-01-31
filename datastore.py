@@ -44,7 +44,11 @@ class Phone(db.Model):
   def is_valid_number(cls, number):
     """Is the given phone number valid?"""
     clean_number = re.sub(r'\D+', '', number)
-    return (len(clean_number) == 10 or len(clean_number) == 11)
+    if len(clean_number) == 10:
+      return True
+    elif len(clean_number) == 11 and clean_number.startswith('1'):
+      return True
+    return False
 
   @classmethod
   def normalize_number(cls, number):
