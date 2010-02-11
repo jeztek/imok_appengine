@@ -58,6 +58,6 @@ def getEmailErrorIfAny(email):
   try:
     django.core.validators.isValidEmail(email, None)
   except django.core.validators.ValidationError, exc:
-    return 'Enter a valid e-mail address'
+    return 'Enter a valid email address'
   else:
     return None

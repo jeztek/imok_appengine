@@ -11,13 +11,13 @@
 
   <div id="wizardContent">
     <div>
-      <b>Add E-Mail Contacts</b><br/><br/>
+      <b>Add Email Contacts</b><br/><br/>
 
       <div class="newUserInstructions">
-        Enter e-mails of people you'd like to notify with <i>I'm OK!</i>.
+        Enter emails of people you'd like to notify with <i>I'm OK!</i>
         <br/><br/>
         You may skip this for now, but you <i>must</i> complete this step
-	before you can use your phone with this	service.<br/><br/>
+	before you notify people with this service.<br/><br/>
       </div>
 
       {% if emailError %}
@@ -31,7 +31,7 @@
 
     <div>
       {% if registeredEmailList %}
-      <br/>Current e-mail contacts:
+      <br/>Current email contacts:
       <table>
 	{% for registeredEmail in registeredEmailList %}
 	<tr>

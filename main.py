@@ -126,7 +126,7 @@ class HomeHandler(RequestHandlerPlus):
     if phone and not phone.verified:
       banner = mark_safe('You must <a href="/phone/verify">verify your phone number</a> before you can post messages.')
     elif not emails:
-      banner = mark_safe('You must <a href="/email">add e-mail contacts</a> or no one will get your messages.')
+      banner = mark_safe('You must <a href="/email">add email contacts</a> or no one will get your messages.')
 
     self.render('home.html', self.getContext(locals()))
 
