@@ -153,12 +153,16 @@ class Post(db.Model):
 class SmsMessage(db.Model):
   phone_number = db.StringProperty(required=True)
   message      = db.StringProperty(required=True, multiline=True)
+  provider     = db.StringProperty(required=True,
+                                   choices=set(['android','twilio']),
+                                   default='twilio')
   direction    = db.StringProperty(required=True, 
                                    choices=set(['incoming', 'outgoing']), 
                                    default='outgoing')
   status       = db.StringProperty(required=True,
-                                   choices=set(['queued', 'sent', 'delivered',
+                                   choices=set(['queued', 'sent', 'delivered', 'failed',
                                                 'fresh', 'processed', 'unclaimed']),
                                    default="queued")
+  twilio_sid   = db.StringProperty()
   create_time  = db.DateTimeProperty(auto_now_add=True)
 

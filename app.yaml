@@ -1,4 +1,4 @@
-application: imokapp
+application: imokdev
 version: 1
 runtime: python
 api_version: 1
@@ -34,8 +34,11 @@ handlers:
 - url: /bb.*
   script: blackberry.py
 
-- url: /smsgateway/.*
-  script: smsgateway.py
+- url: /smsgateway/android/.*
+  script: sms_android.py
+
+- url: /smsgateway/twilio/.*
+  script: sms_twilio.py
 
 - url: /tasks/.*
   script: tasks.py

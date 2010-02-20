@@ -23,6 +23,7 @@ import settings
 from datastore import *
 from imokutils import *
 from imokforms import *
+from smsutils import *
 
 class IntroHandler(RequestHandlerPlus):
   def get(self):
@@ -249,10 +250,13 @@ class VerifyPhoneHandler(RequestHandlerPlus):
 
     # Generate a code
     phone.code = Phone.generate_code()
+    phone.put()
+
     message = "Verification Code: %s" % phone.code
-    sms = SmsMessage(phone_number=phone.number, 
-                     message=message)
-    db.put([sms, phone])
+    sendSms(phone, message)
+    #sms = SmsMessage(phone_number=phone.number, 
+    #                 message=message)
+    #db.put([sms, phone])
 
     self.redirect(redir_location)
 
