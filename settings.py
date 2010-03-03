@@ -19,6 +19,8 @@ TWILIO_AUTH_TOKEN = 'YYYYYYYYYYYYYY'
 
 TWILIO_API_VERSION = '2008-08-01'
 
+HOST = 'yourserver.com'
+
 MAILER_EMAIL = 'imok.mailer@gmail.com'
 
 def template_path(template_file):

@@ -13,9 +13,8 @@ from google.appengine.ext.webapp.util import login_required
 from google.appengine.api import mail
 
 import settings as s
+from smsutils import sendSms
 
-def sendSms(sms_message):
-  sms_message.put()
 
 def secret_required(handler_method):
   def check_secret(self, *args):
@@ -80,13 +79,15 @@ class IncomingHandler(webapp.RequestHandler):
 
     sms_message.status = 'processed'
 
-    response_sms = SmsMessage(phone_number=phone,
-                              message="IMOk: Message received, %d contact(s) notified." % email_query.count(),
-                              direction="outgoing",
-                              status="queued")
+#     Response_sms = SmsMessage(phone_number=phone,
+#                               message="IMOk: Message received, %d contact(s) notified." % email_query.count(),
+#                               direction="outgoing",
+#                               status="queued")
 
-    db.put([ response_sms, sms_message ])
-
+    sendSms(phone=phone_entity, message="IMOk: Message received, %d contact(s) notified." % email_query.count())
+#    db.put([ response_sms, sms_message ])
+    db.put([sms_message])
+    
     #self.response.out.write(message)
     self.response.out.write(json.dumps({'result': 'ok'}))
 

@@ -1,5 +1,5 @@
-application: imokdev
-version: 1
+application: imokapp
+version: 2
 runtime: python
 api_version: 1
 
