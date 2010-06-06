@@ -49,8 +49,10 @@ class MessageHandler(RequestHandlerPlus):
   def get(self):
     if users.get_current_user():
         logout_url = users.create_logout_url("/")
+        loggedIn = True
     else:
         mustLogIn = "True" # this is so the navigation bar only shows the relevant things.
+        loggedIn = False
         login_url = users.create_login_url("/home")
 
     unique_id = self.request.get('unique_id')
@@ -62,13 +64,56 @@ class MessageHandler(RequestHandlerPlus):
       self.render('404Error.html', {})
       return
 
+    repliesRaw = Reply.all().filter('post = ', post)
+    replies = []
+    
+    profile = ImokUser.all().filter('account =', post.user).get()
+
+    for reply in repliesRaw:
+      replies.append({ "message": reply.message,
+                       "dateTime": formatLocalFromUtc(reply.datetime, profile.tz),
+                       "user": ImokUser.all().filter('account =', reply.user).get()
+                       })
+    
+
     lat = str(post.lat)
     lon = str(post.lon)
-    profile = ImokUser.all().filter('account =', post.user).get()
     dateTime = formatLocalFromUtc(post.datetime, profile.tz)
     key = settings.MAPS_KEY
 
     self.render('message.html', self.getContext(locals()))
+
+  def post(self):
+    if not users.get_current_user():
+      self.redirect('/')
+
+    loggedIn = True
+    logout_url = users.create_logout_url("/")
+
+    unique_id = self.request.get('unique_id')
+    idQuery = Post.all().filter('unique_id = ', unique_id)
+    post = idQuery.get()
+
+    if not post:
+      self.error(404)
+      self.render('404Error.html', {})
+      return
+
+    if (not self.request.get('replyText')):
+      self.error(500)
+      return
+
+    phone = Phone.all().filter('user = ', post.user).get()
+
+    reply = Reply(message=self.request.get('replyText'),
+                  post=post,
+                  user=users.get_current_user())
+
+    sendSms(phone, self.request.get('replyText'))
+
+    db.put(reply)
+
+    self.redirect('/message?unique_id=%s' % self.request.get('unique_id') )
 
 class EditProfileHandler(RequestHandlerPlus):
   @login_required

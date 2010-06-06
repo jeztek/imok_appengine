@@ -152,6 +152,13 @@ class Post(db.Model):
 </div>
 """ % (self.unique_id, self.message, meta))
 
+class Reply(db.Model):
+  user 	   = db.UserProperty()
+  datetime = db.DateTimeProperty(auto_now_add=True)
+
+  post = db.ReferenceProperty(Post, required=True)
+  message  = db.StringProperty(multiline=True)
+
 class SmsMessage(db.Model):
   phone_number = db.StringProperty(required=True)
   message      = db.StringProperty(required=True, multiline=True)

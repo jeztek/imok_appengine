@@ -13,12 +13,85 @@
   padding: 0px;
   padding: 8px;
   }
+
+  .replyForm, #remaining {
+    margin: 5px 0px;
+    padding-left: 20px;
+  }
+
+  input[type=text] {
+  font-size: 1em;
+  font-weight: normal;
+  background-color: #ffffff;
+  border: solid 1px #8e8eae;
+  padding: 8px;
+  margin: 0px;
+  width: 97.25%;
+  }
   table.messageDetail th {
   color: #999999;
   text-align: right;
   padding-right: 10px;
   }
+
+  .replies {
+  margin: 10px 0px;
+  padding-left: 20px; 
+  }
+  
+  .reply {
+  border-top: solid 1px #8e8eae;
+  padding: 8px 0px;  
+  }
+
+  .reply .when {
+  float: right;
+  }
+  .reply .message {
+  clear:both;
+  }
 </style>
+
+{% if loggedIn %}
+<script type="text/javascript">
+  var help = "Reply to this message..."
+  var helpColor = '#aaaaaa';
+  var normalColor = '#000000';
+
+  $(function() {
+    $('#replyText').css('color', helpColor);
+    $('#replyText').val(help);
+
+    $('#replyText').focusin(function() {
+      if ($(this).val() == help) {
+        $(this).val('');
+        $('#replyText').css('color', normalColor);
+      }
+    });
+
+    $('#replyText').focusout(function() {
+      if ($(this).val() == '') {
+        $(this).val(help);
+        $('#replyText').css('color', helpColor);
+      }
+    });
+
+    $('#replyText').keyup(function() {
+      var remaining = 160 - $('#replyText').val().length;
+      $('#charCount').html(remaining);
+      if(remaining < 0) {
+        $('#remaining').css('color', '#ff0000');
+        $('#send').attr('disabled', 'disabled');
+      } else {
+        $('#remaining').css('color', '#000000');
+        $('#send').attr('disabled', '');
+      }
+    
+    });
+  });
+</script>
+{% endif %}
+
 <div class="messageInfoBar">
   <table class="messageDetail">
     <tr>
@@ -38,4 +111,28 @@
   </table>
   <br/>
   <div class="theMessage">{{ post.message }}</div>
+
+  {% if replies %}
+    <div class="replies">
+    {% for reply in replies %}
+      <div class="reply">
+        <div class="when">{{reply.dateTime}}</div>
+        <div class="from">{{ reply.user.firstName }} {{ reply.user.lastName }} &#60;{{ reply.user.account }}&#62;</td></div>
+        <div class="message">{{reply.message}}</div>
+      </div>
+    {% endfor %}
+    </div>
+  {% endif %}
+
+  {% if loggedIn %}
+  <div class="replyForm">
+    <form name="reply" method="post">
+      <input class="theMessage" id="replyText" name="replyText" type="text" value="Reply...">
+      <input style="float: right" id="send" type="submit" name="send" value="Send Reply">
+      <div id="remaining">
+        Characters Remaining: 
+        <span id="charCount">160</span></div>
+    </form>
+  </div>
+  {% endif %}
 </div>
