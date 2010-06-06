@@ -69,8 +69,10 @@ class IncomingHandler(webapp.RequestHandler):
     user = phone_entity.user
     self.savePostAndPush(text, phoneNumber, user, smsMessage)
 
-  def savePostAndPush(self, text, phoneNumber, user, smsMessage=None):
+  def savePostAndPush(self, text, phoneNumber, user, smsMessage=None, bogusTimestamp=None):
     post = Post.fromText(text)
+    if bogusTimestamp != None:
+      post.datetime = bogusTimestamp
     post.unique_id = Post.gen_unique_key()
     post.user = user
     objects = [post]

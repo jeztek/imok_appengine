@@ -13,6 +13,7 @@ try:
 except ImportError:
   from django import forms
 import django.core.exceptions
+import iso8601
 
 import settings
 from datastore import *
@@ -23,6 +24,9 @@ from sms_twilio import IncomingHandler
 class DebugHandler(RequestHandlerPlus):
   @login_required
   def get(self):
+    nowUtc = datetime.datetime.now()
+    nowLocal = nowUtc - datetime.timedelta(seconds=4*3600)
+    now = nowLocal.isoformat() + '-04:00';
     self.render('debug.html', self.getContext(locals()))
 
 def deleteAll(table):
@@ -46,11 +50,15 @@ class DebugPostHandler(RequestHandlerPlus):
     okUser = ImokUser.getProfileForUser(user)
     # get arbitrary phone number for this user
     phoneNumber = Phone.all().filter('user =', user).fetch(1)[0].number
+    text = self.request.POST['text']
+    timeWithTz = iso8601.parse_date(self.request.POST['timestamp'])
+    timeUtc = timeWithTz.replace(tzinfo=None) - timeWithTz.utcoffset()
     hnd = IncomingHandler()
     hnd.initialize(self.request, self.response)
-    debugOutput = hnd.savePostAndPush(text='test message #loc 37,-122',
+    debugOutput = hnd.savePostAndPush(text=text,
                                       phoneNumber=phoneNumber,
-                                      user=user)
+                                      user=user,
+                                      bogusTimestamp=timeUtc)
 
     self.response.headers['Content-Type'] = 'text/plain'
     if debugOutput:
