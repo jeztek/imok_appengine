@@ -18,6 +18,7 @@ import settings
 from datastore import *
 from imokutils import *
 from imokforms import *
+from sms_twilio import IncomingHandler
 
 class DebugHandler(RequestHandlerPlus):
   @login_required
@@ -42,35 +43,20 @@ class ResetDbHandler(RequestHandlerPlus):
 class DebugPostHandler(RequestHandlerPlus):
   def post(self):
     user = users.get_current_user()
-    okUser = ImokUser.all().filter('account =', user).get()
-    
-    p = Post(user=user, message='test message', lat=37., lon=-122.)
-    p.unique_id = Post.gen_unique_key()
-    p.put()
+    okUser = ImokUser.getProfileForUser(user)
+    # get arbitrary phone number for this user
+    phoneNumber = Phone.all().filter('user =', user).fetch(1)[0].number
+    hnd = IncomingHandler()
+    hnd.initialize(self.request, self.response)
+    debugOutput = hnd.savePostAndPush(text='test message #loc 37,-122',
+                                      phoneNumber=phoneNumber,
+                                      user=user)
 
-    registeredEmailQuery = RegisteredEmail.all().filter('userName =', users.get_current_user()).order('emailAddress')
-    
-    debug_output = []
-    for registeredEmail in registeredEmailQuery:
-      templateData = {
-        'message': p.message,
-        'link': p.permalink(self.request.host_url),
-        'user': okUser,
-        'unsubscribe_link': registeredEmail.permalink(self.request.host_url)
-        }
-      emailBody = template.render(settings.template_path('email.txt'), templateData)
-      mail.send_mail(sender=settings.MAILER_EMAIL,
-                     to=registeredEmail.emailAddress,
-                     subject="I'm OK",
-                     body=emailBody)
-      debug_output.append(emailBody)
-
-    if debug_output:
-      self.response.headers['Content-Type'] = 'text/plain'
-      self.response.out.write("\n\n".join(debug_output))
-      return
-    
-    self.redirect('/home')
+    self.response.headers['Content-Type'] = 'text/plain'
+    if debugOutput:
+      self.response.out.write("\n\n".join(debugOutput))
+    else:
+      self.response.out.write("no emails registered")
     
 def main():
   application = webapp.WSGIApplication([

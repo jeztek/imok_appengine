@@ -23,6 +23,9 @@ HOST = 'yourserver.com'
 
 MAILER_EMAIL = 'imok.mailer@gmail.com'
 
+PERSON_FINDER_URL = 'http://chilepersonfinder.appspot.com/api/write?key=%(key)s'
+PERSON_FINDER_DEADLINE_SECONDS = 10
+
 def template_path(template_file):
   return os.path.join(TEMPLATE_DIR, template_file)
 

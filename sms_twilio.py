@@ -14,7 +14,7 @@ from google.appengine.api import mail
 
 import re
 import twilio
-
+import personFinder
 import logging
 
 import settings as s
@@ -46,38 +46,48 @@ class IncomingHandler(webapp.RequestHandler):
       logging.error("Invalid request. Probably not Twilio.")
     
     sms_sid = self.request.get('SmsSid')
-    phone = Phone.normalize_number(self.request.get('From'))
-    message = self.request.get('Body')
+    phoneNumber = Phone.normalize_number(self.request.get('From'))
+    text = self.request.get('Body')
 
-    if not (message and phone):
-      logging.error('WTF. No phone or message.')
+    if not (text and phoneNumber):
+      logging.error('WTF. No phoneNumber or message text.')
       return
 
-    sms_message = SmsMessage(phone_number=phone, 
-                         message=message, 
-                         direction='incoming',
-                         twilio_sid=sms_sid,
-                         status='unclaimed')
-    objects = [ sms_message ]
+    smsMessage = SmsMessage(phone_number=phoneNumber, 
+                            message=text, 
+                            direction='incoming',
+                            twilio_sid=sms_sid,
+                            status='unclaimed')
 
-    phone_entity = Phone.all().filter('number =', phone).get()
+    phone_entity = Phone.all().filter('number =', phoneNumber).get()
 
     if not phone_entity:
-      db.put(objects)
+      db.put([smsMessage])
       #self.response.out.write(json.dumps({'result': 'ok'}))
       return
 
-    post = Post.fromText(message)
-    post.unique_id = Post.gen_unique_key()
-    post.user = phone_entity.user
-    objects.append(post)
-    sms_message.status = 'queued'
+    user = phone_entity.user
+    self.savePostAndPush(text, phoneNumber, user, smsMessage)
 
+  def savePostAndPush(self, text, phoneNumber, user, smsMessage=None):
+    post = Post.fromText(text)
+    post.unique_id = Post.gen_unique_key()
+    post.user = user
+    objects = [post]
+    if smsMessage != None:
+      smsMessage.status = 'queued'
+      objects.append(smsMessage)
     db.put(objects)
 
-    imok_user = ImokUser.all().filter('account =', phone_entity.user).get()
-    email_query = RegisteredEmail.all().filter('userName =', phone_entity.user).order('emailAddress')
+    ######################################################################
+    # send email
 
+    # FIX: this block of code does not belong in sms_twilio
+
+    imok_user = ImokUser.getProfileForUser(user)
+    email_query = RegisteredEmail.all().filter('userName =', user).order('emailAddress')
+
+    debugOutput = []
     for email in email_query:
       template_data = {
         'message': post.message,
@@ -86,23 +96,33 @@ class IncomingHandler(webapp.RequestHandler):
         'user': imok_user
         }
       body = template.render(s.template_path('email.txt'), template_data)
+      debugOutput.append(body)
       mail.send_mail(sender=s.MAILER_EMAIL,
                      to=email.emailAddress,
                      subject="IMOk status",
                      body=body)
 
-    sms_message.status = 'processed'
-    sms_message.put()
+    ######################################################################
+    # post to person finder
+    debugText = personFinder.postToPersonFinder(post)
+    debugOutput.append(debugText)
 
-    response_sms = SmsMessage(phone_number=phone,
-                              message="IMOk: Message received, %d contact(s) notified." % email_query.count(),
-                              direction="outgoing",
-                              status="queued")
-    #response_sms.put()
-    sendSms(response_sms)
+    ######################################################################
+    # send confirmation SMS
+    if smsMessage != None:
+      smsMessage.status = 'processed'
+      smsMessage.put()
+
+      response_sms = SmsMessage(phone_number=phoneNumber,
+                                message="I'm OK: Message received, %d contact(s) notified." % email_query.count(),
+                                direction="outgoing",
+                                status="queued")
+      #response_sms.put()
+      sendSms(response_sms)
 
     #self.response.out.write(message)
     #self.response.out.write(json.dumps({'result': 'ok'}))
+    return debugOutput
 
 class CallbackHandler(webapp.RequestHandler):
   def post(self):
