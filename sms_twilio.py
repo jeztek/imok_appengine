@@ -5,6 +5,8 @@ except ImportError:
 
 from datastore import Post, SmsMessage, Phone, RegisteredEmail, ImokUser
 
+from twitter import twitter_post
+
 from google.appengine.api import users
 from google.appengine.ext import webapp
 from google.appengine.ext import db
@@ -104,10 +106,13 @@ class IncomingHandler(webapp.RequestHandler):
                      subject="IMOk status",
                      body=body)
 
+    twitter_post(imok_user, post.message)
+
     ######################################################################
     # post to person finder
-    debugText = personFinder.postToPersonFinder(post)
-    debugOutput.append(debugText)
+    if 0:
+      debugText = personFinder.postToPersonFinder(post)
+      debugOutput.append(debugText)
 
     ######################################################################
     # send confirmation SMS
@@ -125,6 +130,8 @@ class IncomingHandler(webapp.RequestHandler):
     #self.response.out.write(message)
     #self.response.out.write(json.dumps({'result': 'ok'}))
     return debugOutput
+
+
 
 class CallbackHandler(webapp.RequestHandler):
   def post(self):

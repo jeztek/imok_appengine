@@ -19,6 +19,7 @@ from datastore import *
 from imokutils import *
 from imokforms import *
 
+
 class NewUserProfileHandler(RequestHandlerPlus):
   @login_required
   def get(self):
@@ -38,6 +39,7 @@ class NewUserProfileHandler(RequestHandlerPlus):
     user = users.get_current_user()
     profile = getProfile(True)
     form = UserProfileForm(data=self.request.POST, instance=profile)
+
     if form.is_valid():
       # Save the data and redirect to home
       form.saveWithPhone()

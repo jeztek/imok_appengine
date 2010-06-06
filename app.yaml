@@ -1,4 +1,4 @@
-application: imokapp
+application: imokdev
 version: 2
 runtime: python
 api_version: 1

@@ -17,6 +17,8 @@ import django.core.exceptions
 from datastore import *
 from imokutils import *
 
+from twitter import validate_password
+
 class PhoneField(forms.CharField):
   def __init__(self, *args, **kwargs):
     kwargs['max_length'] = 12
@@ -45,9 +47,29 @@ class PhoneField(forms.CharField):
 
 class UserProfileForm(djangoforms.ModelForm):
   phoneNumber = PhoneField(label="Mobile phone number*")
+  twitterUsername = forms.CharField(required=False, label="Twitter Username", max_length=40)
+  twitterPassword = forms.CharField(required=False, label="Twitter Password", widget=forms.PasswordInput(), max_length=140)
+
+  def clean_twitterPassword(self):
+    username = self.clean_data['twitterUsername']
+    password = self.clean_data['twitterPassword']
+
+    if not username and not password:
+      # removing twitter info
+      return password
+
+    if validate_password(username, password) is False:
+      raise forms.ValidationError("Your Twitter password is invalid!")
+
+    # Always return the cleaned data, whether you have changed it or
+    # not.
+    return password
+
 
   def saveWithPhone(self):
     editedProfile = self.save(commit=False)
+    editedProfile.twitter_password = self._cleaned_data()['twitterPassword']
+    editedProfile.twitter_username = self._cleaned_data()['twitterUsername']
     editedProfile.put()
 
     phone = getPhone(createIfNeeded=True)
@@ -62,4 +84,5 @@ class UserProfileForm(djangoforms.ModelForm):
   
   class Meta:
     model = ImokUser
-    exclude = ['account']
+    exclude = ['account', 'twitter_username', 'twitter_password']
+

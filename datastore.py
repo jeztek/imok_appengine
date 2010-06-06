@@ -19,6 +19,8 @@ class ImokUser(db.Model):
   account = db.UserProperty()
   firstName = db.StringProperty(verbose_name='First name')
   lastName = db.StringProperty(verbose_name='Last name')
+  twitter_username = db.StringProperty(verbose_name='Twitter username')
+  twitter_password = db.StringProperty(verbose_name='Twitter password')
   tz = db.StringProperty(default='America/Port-au-Prince', choices=TZ_CHOICES, verbose_name='Time zone')
 
   def getShortName(self):
