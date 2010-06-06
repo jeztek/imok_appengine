@@ -54,6 +54,10 @@ class UserProfileForm(djangoforms.ModelForm):
     username = self.clean_data['twitterUsername']
     password = self.clean_data['twitterPassword']
 
+    if not username and not password:
+      # removing twitter info
+      return password
+
     if validate_password(username, password) is False:
       raise forms.ValidationError("Your Twitter password is invalid!")
 
