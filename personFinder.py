@@ -77,7 +77,7 @@ def postToPersonFinder(post):
     except urlfetch.DownloadError:
         debugOutput += '[request timed out]\n'
     else:
-        debugOutput += '[request returned with http status code %d]' % response.status_code
+        debugOutput += '[request returned with http status code %d]\n' % response.status_code
         debugOutput += 'content: %s\n' % response.content
         debugOutput += 'headers: %s\n' % response.headers
 
