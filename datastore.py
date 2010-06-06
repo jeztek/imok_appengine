@@ -29,6 +29,10 @@ class ImokUser(db.Model):
     else:
       return self.lastName
 
+  @staticmethod
+  def getProfileForUser(user):
+    return ImokUser.all().filter('account =', user).fetch(1)[0]
+
 class Phone(db.Model):
   """
   A registered phone number.
@@ -139,7 +143,7 @@ class Post(db.Model):
   def asWidgetRow(self):
     meta = ''
     displayUser = users.get_current_user()
-    localTzName = ImokUser.all().filter('account =', displayUser).fetch(1)[0].tz
+    localTzName = ImokUser.getProfileForUser(displayUser).tz
     meta += formatLocalFromUtc(self.datetime, localTzName)
     if self.positionText:
       meta += ' at %s' % self.positionText

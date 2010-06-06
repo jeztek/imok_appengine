@@ -1,16 +1,62 @@
 {% extends "base.html" %}
 
+{% block head %}
+<script type="text/javascript">
+  
+function initialize () {
+  var d = new Date();
+  var month = ''+d.getMonth();
+  if (month.length == 1) {
+    month = '0'+month;
+  }
+  var day = ''+d.getDate();
+  if (day.length == 1) {
+    day = '0'+day;
+  }
+  var hours = ''+d.getHours();
+  if (hours.length == 1) {
+    hours = '0'+hours;
+  }
+  var minutes = ''+d.getMinutes();
+  if (minutes.length == 1) {
+    minutes = '0'+minutes;
+  }
+  var seconds = ''+d.getSeconds();
+  if (seconds.length == 1) {
+    seconds = '0'+seconds;
+  }
+  var dstr = d.getFullYear() + '-' + month + '-' + day
+    + 'T'
+    + hours + ':' + minutes + ':' + seconds
+    + '-04:00';
+  console.log(dstr);
+}
+
+</script>
+
+{% endblock head %}
+
 {% block body %}
 
+<!--
 <p>
 <form action="/debug/resetdb" method="post">
   <input type="submit" value="Reset the data store"/>
 </form>
 </p>
+-->
 
 <p>
 <form action="/debug/post" method="post">
-  <input type="submit" value="Post an OK message"/>
+  <div>
+    <label for="id_text">text:</label>
+    <input id="id_text" name="text" type="text" size="50" maxlength="140" value="test message #imok #loc 37.0,-122.0"/>
+  </div>
+  <div>
+    <label for="id_timestamp">timestamp:</label>
+    <input id="id_timestamp" name="timestamp" type="text" size="50" value="{{ now }}"/>
+  </div>
+  <input type="submit" value="Post a message"/>
 </form>
 </p>
 
